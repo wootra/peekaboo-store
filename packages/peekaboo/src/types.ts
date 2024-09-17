@@ -1,6 +1,5 @@
 export type Store = {
 	storeId: `peekabooStore-${number}`;
-	valueIdBase: number;
 	data: Record<string, unknown>;
 };
 

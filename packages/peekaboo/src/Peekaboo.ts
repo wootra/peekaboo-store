@@ -1,20 +1,17 @@
-import { PeekabooMap, PeekabooObj, PeekabooValue, Store } from './types';
+import { PeekabooMap, PeekabooValue, Store } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
-let valueIdBase = Math.round(Math.random() * (1000000 - 1)) + 1000000;
 
 const createStore = (): Store => {
 	const storeId = storeIdBase++;
 
 	return {
 		storeId: `peekabooStore-${storeId}`,
-		valueIdBase,
 		data: {},
 	};
 };
 
-const createValueObj = <T>(store: Store, value: T): PeekabooValue<T> => {
-	const valueId = `peekabooValue-${store.valueIdBase++}`;
+const createValueObj = <T>(store: Store, value: T, valueId: string): PeekabooValue<T> => {
 	store.data[valueId] = value;
 
 	return {
@@ -27,17 +24,18 @@ const createValueObj = <T>(store: Store, value: T): PeekabooValue<T> => {
 	};
 };
 
-const convert = (store: Store, obj: Record<string, { value: unknown; children?: unknown[] }>) => {
+const convert = (store: Store, obj: Record<string, { value: unknown; children?: unknown[] }>, parentKey: string) => {
 	return Object.keys(obj).reduce(
 		(acc, key) => {
+			const currKey = parentKey ? `${parentKey}.${key}` : key;
 			acc[key] = {
-				value: createValueObj(store, obj[key].value),
+				value: createValueObj(store, obj[key].value, currKey),
 			};
 			if (obj[key].children) {
 				if (!Array.isArray(obj[key].children)) {
 					throw new Error('Peekaboo children must be an array');
 				}
-				acc[key].children = obj[key]!.children!.map((child: any) => convert(store, child));
+				acc[key].children = obj[key]!.children!.map((child: any) => convert(store, child, currKey));
 			}
 			return acc;
 		},
@@ -45,18 +43,18 @@ const convert = (store: Store, obj: Record<string, { value: unknown; children?: 
 	);
 };
 
-function Peekaboo<T>(initData: PeekabooMap<T>): PeekabooObj<T> {
+function createPeekaboo<U, T extends PeekabooMap<U> = PeekabooMap<U>>(initData: U): T {
 	const store = createStore();
 	if (typeof initData !== 'object') {
 		throw new Error('Peekaboo initData must be an object');
 	}
 
-	const converted = convert(store, initData as Record<string, { value: unknown; children?: unknown[] }>);
+	const converted = convert(store, initData as Record<string, { value: unknown; children?: unknown[] }>, '');
 
 	return {
 		store,
 		data: converted,
-	} as unknown as PeekabooObj<T>;
+	} as unknown as T;
 }
 
-export { Peekaboo };
+export { createPeekaboo };
