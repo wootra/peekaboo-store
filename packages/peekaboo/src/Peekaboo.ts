@@ -1,4 +1,4 @@
-import { PeekabooMap, PeekabooValue, Store } from './types';
+import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
@@ -11,50 +11,57 @@ const createStore = (): Store => {
 	};
 };
 
-const createValueObj = <T>(store: Store, value: T, valueId: string): PeekabooValue<T> => {
-	store.data[valueId] = value;
+const createValueObj = <T>(store: Store, value: T, booId: string): BooType<T> => {
+	store.data[booId] = value;
 
-	return {
-		valueId,
+	return Object.freeze({
+		booId,
 		init: value,
-		get: () => store.data[valueId] as T,
+		get: () => store.data[booId] as T,
 		set: (newValue: T) => {
-			store.data[valueId] = newValue;
+			store.data[booId] = newValue;
 		},
-	};
+	});
 };
 
-const convert = (store: Store, obj: Record<string, { value: unknown; children?: unknown[] }>, parentKey: string) => {
+const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
+	store: Store,
+	obj: U,
+	parentKey: string
+) => {
 	return Object.keys(obj).reduce(
 		(acc, key) => {
 			const currKey = parentKey ? `${parentKey}.${key}` : key;
-			acc[key] = {
-				value: createValueObj(store, obj[key].value, currKey),
-			};
-			if (obj[key].children) {
-				if (!Array.isArray(obj[key].children)) {
-					throw new Error('Peekaboo children must be an array');
-				}
-				acc[key].children = obj[key]!.children!.map((child: any) => convert(store, child, currKey));
+			if (obj[key as K] && typeof obj[key as K] === 'object') {
+				acc[key as K] = convert(store, obj[key as K], currKey);
+			} else {
+				acc[key as K] = createValueObj(store, obj[key as K], currKey);
 			}
+
 			return acc;
 		},
-		{} as Record<string, { value: unknown; children?: unknown[] }>
+		{} as Record<K, unknown>
 	);
 };
 
-function createPeekaboo<U, T extends PeekabooMap<U> = PeekabooMap<U>>(initData: U): T {
+function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(initData: U): PeekabooObj<U> {
 	const store = createStore();
-	if (typeof initData !== 'object') {
+	if (!initData || typeof initData !== 'object') {
 		throw new Error('Peekaboo initData must be an object');
 	}
 
-	const converted = convert(store, initData as Record<string, { value: unknown; children?: unknown[] }>, '');
+	const converted = convert<U>(store, initData, '') as unknown as PeekabooParsed<U>;
 
 	return {
 		store,
 		data: converted,
-	} as unknown as T;
+	};
 }
 
-export { createPeekaboo };
+function peeka<T>(value: T): PeekaType<T> {
+	return {
+		init: value,
+	};
+}
+
+export { createPeekaboo, peeka };

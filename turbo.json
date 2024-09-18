@@ -1,10 +1,12 @@
 {
 	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
 	"tasks": {
 		"build": {
 			"inputs": ["$TURBO_DEFAULT", ".env*"],
 			"outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-			"dependsOn": ["^build"]
+			"dependsOn": ["^build"],
+			"cache": false
 		},
 		"test": {
 			"outputs": ["coverage/**"],
@@ -12,11 +14,14 @@
 		},
 		"lint": {},
 		"dev": {
+			"inputs": ["$TURBO_DEFAULT", ".env*"],
+			"outputs": ["dist/**", ".next/**", "!.next/cache/**"],
 			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
 		"clean": {
+			"dependsOn": ["^clean"],
 			"cache": false
 		}
 	}

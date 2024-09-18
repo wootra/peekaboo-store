@@ -1,20 +1,27 @@
 'use client';
 
-import { createPeekaboo } from 'peekaboo';
+import { peeka, createPeekaboo, PeekabooValue } from 'peekaboo';
 import { useEffect } from 'react';
-const obj = Object.freeze({
-	test1: {
-		value: 1,
-		children: {
-			test2: 3,
+const obj = {
+	_test1: peeka(12),
+	_test2: {
+		test3: {
+			_test4: {
+				test5: peeka('hi'),
+			},
 		},
 	},
-	test2: {
-		value: 2,
-	},
-});
+};
 
 const peekaboo = createPeekaboo(obj);
+peekaboo.data._test2.test3;
+peekaboo.data._test1;
+
+function test<T>(val: PeekabooValue<T>) {
+	val.get();
+}
+
+test(peekaboo.data._test2.test3._test4.test5);
 
 export default function Page() {
 	useEffect(() => {
