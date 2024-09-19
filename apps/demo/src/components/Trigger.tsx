@@ -11,7 +11,7 @@ function Trigger<T>({ boo }: { boo: BooType<T> }) {
 
 	return (
 		<div>
-			<h2>{boo.booId}</h2>
+			<h2>{boo.init as string}</h2>
 
 			<button onClick={() => onClick(1)}>click 1</button>
 			<button onClick={() => onClick(2)}>click 2</button>

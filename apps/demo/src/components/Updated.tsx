@@ -9,7 +9,7 @@ function Updated<T>({ boo }: { boo: BooType<T> }) {
 	const val = usePeekaboo(boo);
 	return (
 		<div>
-			updated for ${boo.booId}: {JSON.stringify(val)}
+			updated for ${boo.init as string}: {JSON.stringify(val)}
 		</div>
 	);
 }

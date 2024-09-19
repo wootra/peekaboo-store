@@ -19,4 +19,3 @@ But what if they are managed with full typescript support?
 
 ```
 
-![alt text](image.png)
