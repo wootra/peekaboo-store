@@ -4,6 +4,7 @@ type Store = {
 };
 
 type PeekaType<K> = {
+	peekabooType: 'peeka';
 	init: K;
 };
 

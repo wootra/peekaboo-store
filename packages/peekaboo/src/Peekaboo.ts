@@ -1,3 +1,4 @@
+import { UPDATE_VALUE } from './consts';
 import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
@@ -11,15 +12,26 @@ const createStore = (): Store => {
 	};
 };
 
-const createValueObj = <T>(store: Store, value: T, booId: string): BooType<T> => {
-	store.data[booId] = value;
+const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string): BooType<T> => {
+	const booId = `${store.storeId}-${booIdSrc}`;
+	store.data[booId] = value.init;
 
 	return Object.freeze({
 		booId,
-		init: value,
+		init: value.init,
 		get: () => store.data[booId] as T,
 		set: (newValue: T) => {
 			store.data[booId] = newValue;
+			if (window !== undefined) {
+				window.dispatchEvent(
+					new CustomEvent(UPDATE_VALUE, {
+						detail: {
+							id: booId,
+							current: newValue,
+						},
+					})
+				);
+			}
 		},
 	});
 };
@@ -33,9 +45,13 @@ const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = key
 		(acc, key) => {
 			const currKey = parentKey ? `${parentKey}.${key}` : key;
 			if (obj[key as K] && typeof obj[key as K] === 'object') {
-				acc[key as K] = convert(store, obj[key as K], currKey);
+				if ('peekabooType' in obj[key as K] && (obj[key as K] as PeekaType<any>).peekabooType === 'peeka') {
+					acc[key as K] = createValueObj(store, obj[key as K], currKey);
+				} else {
+					acc[key as K] = convert(store, obj[key as K], currKey);
+				}
 			} else {
-				acc[key as K] = createValueObj(store, obj[key as K], currKey);
+				throw new Error('you should wrap this value with peeka - where is triggering error is:' + currKey);
 			}
 
 			return acc;
@@ -60,6 +76,7 @@ function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(i
 
 function peeka<T>(value: T): PeekaType<T> {
 	return {
+		peekabooType: 'peeka',
 		init: value,
 	};
 }
