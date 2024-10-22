@@ -1,13 +1,18 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Updated from 'components/Updated';
 
 import Trigger from 'components/Trigger';
 import { peekaboo } from 'const';
+import { getUsageLog } from 'peekaboo-store';
 
 export default function Page() {
 	const slice = peekaboo.data.routes.page2;
+	useEffect(() => {
+		// @ts-ignore
+		window.logUsed = () => getUsageLog(peekaboo);
+	}, []);
 	// const dropDownIndex = useAtomValue(peeks.atoms.page1.dropDownIndex.init);
 	const arrays = useMemo(() => {
 		return new Array(1000).fill(null).map((_, idx) => {

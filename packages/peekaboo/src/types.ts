@@ -20,6 +20,7 @@ type BooType<T> = Readonly<{
 	init: T;
 	get: () => T;
 	set: Setter<T>;
+	used: () => boolean;
 }>;
 
 type PeekabooParsed<K> = {

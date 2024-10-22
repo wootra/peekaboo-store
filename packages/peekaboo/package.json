@@ -15,10 +15,17 @@
 		"./vanilla": "./dist/vanilla/index.mjs"
 	},
 	"scripts": {
-		"build": "tsup src/index.ts src/react/index.ts src/vanilla/index.ts --format esm,cjs --dts --external react",
+		"build": "tsup",
 		"dev": "pnpm run build --watch",
 		"lint": "eslint \"src/**/*.ts*\"",
-		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+		"pre-patch": "sh ./publish.sh prepatch",
+		"pre-minor": "sh ./publish.sh preminor",
+		"pre-major": "sh ./publish.sh premajor",
+		"pre-release": "sh ./publish.sh prerelease",
+		"patch": "sh ./publish.sh patch",
+		"minor": "sh ./publish.sh minor",
+		"major": "sh ./publish.sh major",
+		"publish-now": "npm publish --access public"
 	},
 	"devDependencies": {
 		"@acme/eslint-config": "workspace:*",
