@@ -26,6 +26,12 @@ const peeks = {
 				subTitle: peeka('page1-header-subtitle'),
 			},
 		},
+		page2: {
+			header: {
+				title: peeka('page2-header-title'),
+				subTitle: peeka('page2-header-subtitle'),
+			},
+		},
 	},
 };
 

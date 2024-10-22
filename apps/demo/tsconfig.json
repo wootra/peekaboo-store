@@ -1,14 +1,15 @@
 {
-  "exclude": ["node_modules"],
-  "extends": "@acme/tsconfig/nextjs.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
-  },
-  "include": ["src", "next-env.d.ts", ".next/types/**/*.ts"]
+	"exclude": ["node_modules"],
+	"extends": "@acme/tsconfig/nextjs.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"incremental": true,
+		"plugins": [
+			{
+				"name": "next"
+			}
+		],
+		"baseUrl": "src"
+	},
+	"include": ["src", "next-env.d.ts", ".next/types/**/*.ts"]
 }

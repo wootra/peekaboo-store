@@ -6,7 +6,7 @@ import { validateBoo } from '../utils';
 
 export const usePeekaboo = <T>(boo: BooType<T>, setState: (val: T) => void) => {
 	validateBoo(boo);
-	let state = boo.init;
+	let state = boo.get() ?? boo.init;
 	const listener: EventListenerOrEventListenerObject = e => {
 		const ev = e as CustomEvent;
 		if (ev.type === UPDATE_VALUE && ev.detail.id === boo.booId) {

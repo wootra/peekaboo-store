@@ -10,9 +10,9 @@
 		"dist/**"
 	],
 	"exports": {
-		".": "./src/index.ts",
-		"./react": "./src/react/index.ts",
-		"./vanilla": "./src/vanilla/index.ts"
+		".": "./dist/index.mjs",
+		"./react": "./dist/react/index.mjs",
+		"./vanilla": "./dist/vanilla/index.mjs"
 	},
 	"scripts": {
 		"build": "tsup src/index.ts src/react/index.ts src/vanilla/index.ts --format esm,cjs --dts --external react",
@@ -27,10 +27,13 @@
 		"@types/react-dom": "^18.2.19",
 		"@typescript-eslint/eslint-plugin": "^8.6.0",
 		"@typescript-eslint/parser": "^8.6.0",
+		"@vitejs/plugin-react": "^4.3.3",
 		"eslint": "^8.57.0",
 		"eslint-config-standard-with-typescript": "^43.0.1",
 		"tsup": "^8.0.2",
-		"typescript": "^5.6.2"
+		"typescript": "^5.6.2",
+		"vite": "^5.4.9",
+		"vite-plugin-dts": "^4.2.4"
 	},
 	"peerDependencies": {
 		"react": "^18.2.0"
