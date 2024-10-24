@@ -1,7 +1,7 @@
 # Peekaboo! (peekaboo-store)
 
 ---
-| ![peekaboo](./peekaboo.png) |
+| ![peekaboo](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/peekaboo.png?raw=true) |
 ---
 
 Peekaboo (peekaboo-store) is a simple and lightweight store management library.
