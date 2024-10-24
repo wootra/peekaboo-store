@@ -1,0 +1,25 @@
+.rootLayout {
+	position: sticky;
+	display: flex;
+	gap: 1rem;
+	top: 0;
+	height: 30px;
+	background: white;
+	z-index: 1;
+}
+
+.pageLayout {
+	position: sticky;
+	display: flex;
+	gap: 1rem;
+	top: 30px;
+	height: 30px;
+	background: #e6e6db;
+	z-index: 1;
+}
+
+.link {
+	color: #0070f3;
+	text-decoration: none;
+	font-size: 24px;
+}

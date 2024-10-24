@@ -1,0 +1,23 @@
+a {
+	text-decoration: none;
+	padding-inline: 0.5rem;
+	border-radius: 0.5rem;
+	&.active {
+		color: white;
+		background-color: #ff8c00;
+		&:hover {
+			color: white;
+			background-color: #ff8c00;
+		}
+	}
+	&:hover {
+		color: #128049;
+		background-color: #eaff00;
+	}
+
+	&:visitied,
+	&:active,
+	&:hover {
+		text-decoration: none;
+	}
+}

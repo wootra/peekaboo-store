@@ -12,24 +12,34 @@ type PeekabooMap<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? PeekaType<T> : K[Key];
 };
 
-// eslint-disable-next-line no-unused-vars
 type Setter<T> = (_value: T) => void;
 
 type BooType<T> = Readonly<{
 	booId: string;
-	init: T;
+	init: () => T;
+	__initialize: (_newVal?: T) => void;
 	get: () => T;
 	set: Setter<T>;
 	used: () => boolean;
 }>;
 
 type PeekabooParsed<K> = {
-	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? BooType<T> : PeekabooParsed<K[Key]>;
+	[Key in keyof K]: K[Key] extends PeekaType<infer T>
+		? BooType<T>
+		: K[Key] extends string | number | boolean | null | undefined
+			? BooType<K[Key]>
+			: PeekabooParsed<K[Key]>;
 };
 
-type PeekabooObj<K> = {
+type CreateSliceType<
+	U extends { [Key in keyof U & `_${string}`]: U[Key] },
+	T extends { [Key in keyof T & `_${string}`]: T[Key] },
+	K extends PeekabooParsed<T>,
+> = (_sliceFunc: (_peekabooData: PeekabooParsed<U>) => K) => K;
+
+type PeekabooObj<U> = {
 	store: Store;
-	data: PeekabooParsed<K>;
+	data: PeekabooParsed<U>;
 };
 
-export type { Store, BooType, PeekabooParsed, PeekabooObj, Setter, PeekabooMap, PeekaType };
+export type { Store, BooType, PeekabooParsed, PeekabooObj, Setter, PeekabooMap, PeekaType, CreateSliceType };

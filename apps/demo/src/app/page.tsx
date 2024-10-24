@@ -7,7 +7,7 @@ import Trigger from '../components/Trigger';
 import Link from 'next/link';
 
 export default function Page({ children }: PropsWithChildren) {
-	// const dropDownIndex = useAtomValue(peeks.atoms.page1.dropDownIndex.init);
+	// const dropDownIndex = useAtomValue(peeks.atoms.page1.dropDownIndex.init());
 
 	return <div>{children}</div>;
 }

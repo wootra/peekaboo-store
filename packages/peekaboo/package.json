@@ -9,6 +9,11 @@
 	"files": [
 		"dist/**"
 	],
+	"exports2": {
+		".": "./src/index.ts",
+		"./react": "./src/react/index.ts",
+		"./vanilla": "./src/vanilla/index.ts"
+	},
 	"exports": {
 		".": "./dist/index.mjs",
 		"./react": "./dist/react/index.mjs",

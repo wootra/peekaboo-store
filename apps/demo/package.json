@@ -5,7 +5,8 @@
 	"scripts": {
 		"build": "pnpm install;next build",
 		"start": "next start ",
-		"dev": "next dev -p 3002",
+		"dev": "next dev -p 3000",
+		"debug": "NODE_OPTIONS='--inspect' next dev",
 		"lint": "next lint",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
 	},
@@ -23,6 +24,7 @@
 		"@types/node": "^20.11.24",
 		"@types/react": "^18.2.61",
 		"@types/react-dom": "^18.2.19",
+		"postcss-nesting": "^13.0.1",
 		"typescript": "^5.6.2"
 	}
 }

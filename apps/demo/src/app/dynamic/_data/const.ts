@@ -34,5 +34,5 @@ const peeks = {
 		},
 	},
 };
-
-export const peekaboo = createPeekaboo(peeks);
+export type StateType = typeof peeks;
+export const peekaboo = createPeekaboo<StateType>({} as StateType);

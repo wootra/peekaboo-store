@@ -5,25 +5,62 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout title="Welcome to Astro.">
 	<main>
-		<div id="content">test</div>
-		<button id="btn1">change to 1</button>
-		<button id="btn2">change to 2</button>
+		<div id="header1">
+
+			<h2>header1</h2>
+			<div class="content">test</div>
+			<div class="btnHolder">
+				<button class="btn" data-val="1">change to 1</button>
+				<button class="btn" data-val="2">change to 2</button>
+			</div>
+		</div>
+		<div id="header2">
+
+			<h2>header2</h2>
+			<div class="content">test</div>
+			<div class="btnHolder">
+				<button class="btn" data-val="hello">change to hello</button>
+				<button class="btn" data-val="world">change to world</button>
+			</div>
+		</div>
 	</main>
 </Layout>
+<style>
+	main {
+		display: flex;
+	}
+	.btnHolder {
+		display: flex;
+	}
+</style>
 <script >
 	import {usePeekaboo} from 'peekaboo-store/vanilla';
 	import {createPeekaboo, peeka} from 'peekaboo-store';
 	const randomValue = Math.round(Math.random()*10000);
 	const store = createPeekaboo({
-		header1: peeka(randomValue),
+		header1: randomValue,
 		header2: {
-			content: peeka('hello'),
+			content: 'hello',
 		}
 	});
 
-	document.getElementById('btn1')?.addEventListener('click', ()=>{
-		store.data.header1.set(1);
-	});
+	const header1Btns = document.querySelectorAll('#header1 .btn');
+	for(let i=0; i<header1Btns.length; i++){
+		header1Btns.item(i).addEventListener('click', (e)=>{
+			console.log((e.target as HTMLDivElement).dataset["val"]);
+			const val = (e.target as HTMLDivElement).dataset["val"] ?? "-1";
+			store.data.header1.set(parseInt(val));
+		});
+	};
+
+	const header2Btns = document.querySelectorAll('#header2 .btn');
+	for(let i=0; i<header2Btns.length; i++){
+		header2Btns.item(i).addEventListener('click', (e)=>{
+			const val = (e.target as HTMLDivElement).dataset["val"] ?? "not-set";
+			store.data.header2.content.set(val);
+		});
+	};
+
 
 	document.getElementById('btn2')?.addEventListener('click', ()=>{
 		store.data.header1.set(2);
@@ -31,13 +68,28 @@ import Layout from '../layouts/Layout.astro';
 	
 	usePeekaboo(store.data.header1, (v)=>{
 		console.log("event triggered!", v);
-		const el = document.getElementById('content');
+		const el = document.querySelector('#header1 .content');
 		if(el){
 			el.innerHTML = `${v}`;
 		}
-	})
-	const el = document.getElementById('content');
+	});
+
+	usePeekaboo(store.data.header2.content, (v)=>{
+		console.log("event triggered!", v);
+		const el = document.querySelector('#header2 .content');
+		if(el){
+			el.innerHTML = `${v}`;
+		}
+	});
+
+	let el;
+	el = document.querySelector('#header1 .content');
 	if(el){
-		el.innerHTML = `${store.data.header1.init}`;
+		el.innerHTML = `${store.data.header1.init()}`;
+	}
+
+	el = document.querySelector('#header2 .content');
+	if(el){
+		el.innerHTML = `${store.data.header2.content.init()}`;
 	}
 </script>
