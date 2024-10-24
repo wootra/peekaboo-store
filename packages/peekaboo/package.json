@@ -47,6 +47,11 @@
 		"vite": "^5.4.9",
 		"vite-plugin-dts": "^4.2.4"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/wootra/peekaboo-store.git"
+	},
+	"homepage": "https://github.com/wootra/peekaboo-store/tree/main/packages/peekaboo",
 	"peerDependencies": {
 		"react": "^18.2.0"
 	},

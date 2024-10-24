@@ -18,7 +18,12 @@ Jotai or Redux Toolkit can be a solution that share some variable, but to find w
 
 With peekaboo-store, we will have full-typescript support for the data structure.
 
-```typescript
+## Demo
 
-```
+- [DemoCode(React - Next.js)](https://github.com/wootra/peekaboo-store/tree/main/apps/demo)
+- [DemoCode(Vanilla - Astro.js)](https://github.com/wootra/peekaboo-store/tree/main/apps/demo-astro)
+
+## Event-Driven update
+
+Peekaboo store update contents powered by custom event. It updates really fast. 
 

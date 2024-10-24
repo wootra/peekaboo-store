@@ -24,6 +24,7 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 				new CustomEvent(UPDATE_VALUE, {
 					detail: {
 						id: booId,
+						storeId: store.storeId,
 						current: newValue,
 					},
 				})
@@ -37,6 +38,7 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 	};
 
 	return Object.freeze({
+		store,
 		booId,
 		init: () => initValue,
 		used: () => isUsed,
@@ -142,7 +144,13 @@ function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	peekaboo.data = newData;
 
 	if (window !== undefined) {
-		window.dispatchEvent(new CustomEvent(INIT_VALUE));
+		window.dispatchEvent(
+			new CustomEvent(INIT_VALUE, {
+				detail: {
+					storeId: store.storeId,
+				},
+			})
+		);
 	}
 }
 

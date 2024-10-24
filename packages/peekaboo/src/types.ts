@@ -15,6 +15,7 @@ type PeekabooMap<K> = {
 type Setter<T> = (_value: T) => void;
 
 type BooType<T> = Readonly<{
+	store: Store;
 	booId: string;
 	init: () => T;
 	__initialize: (_newVal?: T) => void;

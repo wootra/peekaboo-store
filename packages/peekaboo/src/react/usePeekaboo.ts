@@ -25,7 +25,11 @@ export const usePeekaboo = <T>(boo: () => BooType<T> | undefined, initVal?: T) =
 	useEffect(() => {
 		const listener: EventListenerOrEventListenerObject = e => {
 			const ev = e as CustomEvent;
-			if ((ev.type === UPDATE_VALUE && ev.detail.id === boo()?.booId) || ev.type === INIT_VALUE) {
+			if (!boo()?.store) return;
+			const shouldUpdate =
+				ev.type === UPDATE_VALUE && ev.detail.id === boo()?.booId && ev.detail.storeId === boo()?.store.storeId;
+			const shouldInit = ev.type === INIT_VALUE && ev.detail.storeId === boo()?.store.storeId;
+			if (shouldUpdate || shouldInit) {
 				if (valRef.current === boo()?.get()) return;
 				setTimeout(() => {
 					setState(state => {
