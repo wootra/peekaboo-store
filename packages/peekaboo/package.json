@@ -1,6 +1,6 @@
 {
 	"name": "peekaboo-store",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
@@ -21,6 +21,7 @@
 	},
 	"scripts": {
 		"build": "tsup",
+		"clear": "rm -rf dist",
 		"dev": "pnpm run build --watch",
 		"lint": "eslint \"src/**/*.ts*\"",
 		"pre-patch": "sh ./publish.sh prepatch",

@@ -7,6 +7,7 @@ fi
 
 echo "version is $VERSION"
 pnpm run lint && echo 'lint success' || exit 1
+pnpm run clear && echo 'clear success'
 pnpm rebuild && echo 'build success'|| exit 1
 
 echo $VERSION
