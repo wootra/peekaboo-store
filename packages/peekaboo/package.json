@@ -1,6 +1,6 @@
 {
 	"name": "peekaboo-store",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
@@ -9,12 +9,12 @@
 	"files": [
 		"dist/**"
 	],
-	"exports": {
+	"exports2": {
 		".": "./src/index.ts",
 		"./react": "./src/react/index.ts",
 		"./vanilla": "./src/vanilla/index.ts"
 	},
-	"exports2": {
+	"exports": {
 		".": "./dist/index.mjs",
 		"./react": "./dist/react/index.mjs",
 		"./vanilla": "./dist/vanilla/index.mjs"
