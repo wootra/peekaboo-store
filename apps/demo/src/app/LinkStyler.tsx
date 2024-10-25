@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import React, { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 
 const LinkStyler = ({ className }: { className: string }) => {
 	const location = usePathname();
@@ -11,14 +11,17 @@ const LinkStyler = ({ className }: { className: string }) => {
 		for (let i = 0; i < links.length; i++) {
 			const link = links[i] as HTMLAnchorElement;
 			if (location.includes(link.getAttribute('href') ?? 'NaN')) {
+				if (link.classList.contains('active')) continue;
 				link.classList.add('active');
 			} else {
-				link.classList.remove('active');
+				if (link.classList.contains('active')) {
+					link.classList.remove('active');
+				}
 			}
-			console.log('locatoin', location);
+			console.log('location', location);
 		}
 	}, [location]);
-	return <div></div>;
+	return null;
 };
 
-export default LinkStyler;
+export default memo(LinkStyler);

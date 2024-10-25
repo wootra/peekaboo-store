@@ -1,20 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { usePeekaboo } from 'peekaboo-store/react';
 
 import { BooType } from 'peekaboo-store';
 
-function Updated<T>({ boo }: { boo: () => BooType<T> | undefined }) {
-	const val = usePeekaboo(boo, 'loading' as T);
+function FromGet<T>({ boo }: { boo: BooType<T> }) {
+	return <div>val from get: {JSON.stringify(boo.get())}</div>;
+}
+
+const Memoized = React.memo(FromGet) as typeof FromGet;
+
+function Updated<T>({ boo }: { boo: BooType<T> }) {
+	const val = usePeekaboo(boo);
 	return (
 		<div>
-			<div>val from get: {boo()?.get()?.toString()}</div>
+			<Memoized boo={boo} />
 			<div>
-				updated for {boo()?.init() as string}: {JSON.stringify(val)}
+				updated for {JSON.stringify(boo.init())}: {JSON.stringify(val)}
 			</div>
 		</div>
 	);
 }
 
-export default Updated;
+export default memo(Updated) as typeof Updated;

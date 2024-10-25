@@ -4,17 +4,21 @@ import React from 'react';
 
 import { BooType } from 'peekaboo-store';
 
-function Trigger<T>({ boo }: { boo: () => BooType<T> | undefined }) {
-	const onClick = (num: number) => {
-		boo()?.set(`${num}` as T);
+function Trigger<T>({ boo, options }: { boo: BooType<T>; options: T[] }) {
+	const onClick = (val: T) => {
+		boo.set(val);
 	};
 
 	return (
 		<div>
-			<h2>{boo()?.init() as string}</h2>
-
-			<button onClick={() => onClick(1)}>click 1</button>
-			<button onClick={() => onClick(2)}>click 2</button>
+			<h2>{JSON.stringify(boo.init())}</h2>
+			{options.map((opt, idx) => {
+				return (
+					<button key={'btn-' + idx} onClick={() => onClick(opt)}>
+						click {idx}
+					</button>
+				);
+			})}
 		</div>
 	);
 }

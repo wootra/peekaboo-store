@@ -1,8 +1,8 @@
 'use client';
 
-import { createSlice, updatePeekaboo } from 'peekaboo-store';
+import { updatePeekaboo } from 'peekaboo-store';
 import { useEffect } from 'react';
-import { StateType, peekaboo } from './_data/const';
+import { peekaboo } from './_data/const';
 const mockData: any = {
 	routes: {
 		page1: {
@@ -19,15 +19,11 @@ const mockData: any = {
 		},
 	},
 };
-const slice = createSlice(peekaboo, data => data.routes.page1.header);
 const DataLoader = () => {
 	useEffect(() => {
-		const data = slice();
-		if (!data) {
-			setTimeout(() => {
-				updatePeekaboo(peekaboo, mockData as StateType);
-			}, 2000);
-		}
+		setTimeout(() => {
+			updatePeekaboo(peekaboo, mockData);
+		}, 2000);
 	}, []);
 	return null;
 };

@@ -21,18 +21,18 @@ const peeks = {
 	atoms: atoms,
 	routes: {
 		page1: {
-			header: {
-				title: peeka('page1-header-title'),
-				subTitle: peeka('page1-header-subtitle'),
-			},
+			header: peeka({
+				title: 'page1-header-title(init)',
+				subTitle: 'page1-header-subtitle(init)',
+			}),
 		},
 		page2: {
 			header: {
-				title: peeka('page2-header-title'),
-				subTitle: peeka('page2-header-subtitle'),
+				title: 'page2-header-title(init)',
+				subTitle: 'page2-header-subtitle(init)',
 			},
 		},
 	},
 };
-export type StateType = typeof peeks;
-export const peekaboo = createPeekaboo<StateType>({} as StateType);
+
+export const peekaboo = createPeekaboo(peeks);

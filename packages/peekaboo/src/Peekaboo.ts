@@ -8,6 +8,7 @@ const createStore = (): Store => {
 
 	return {
 		storeId: `peekabooStore-${storeId}`,
+		booMap: {},
 		data: {},
 	};
 };
@@ -37,7 +38,7 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 		store.data[booId] = newVal;
 	};
 
-	return Object.freeze({
+	store.booMap[booId] = Object.freeze({
 		store,
 		booId,
 		init: () => initValue,
@@ -48,7 +49,8 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 			return store.data[booId] as T;
 		},
 		set,
-	});
+	}) as BooType<unknown>;
+	return store.booMap[booId] as BooType<T>;
 };
 
 const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
@@ -77,29 +79,28 @@ const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = key
 
 const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
 	store: Store,
-	obj: U,
+	updateObj: U,
 	parentKey: string
 ) => {
-	return Object.keys(obj).reduce(
-		(acc, key) => {
-			const currKey = parentKey ? `${parentKey}.${key}` : key;
-			if (obj[key as K] && typeof obj[key as K] === 'object') {
-				if ('peekabooType' in obj[key as K] && (obj[key as K] as PeekaType<any>).peekabooType === 'peeka') {
-					if (acc[key as K] === undefined) {
-						acc[key as K] = createValueObj(store, obj[key as K], currKey);
-					}
-					(acc[key as K] as BooType<unknown>).__initialize((obj[key as K] as PeekaType<unknown>).init);
-				} else {
-					acc[key as K] = update(store, obj[key as K], currKey);
-				}
+	Object.keys(updateObj).forEach(key => {
+		const currKey = parentKey ? `${parentKey}.${key}` : key;
+		const keyToFind = `${store.storeId}-${currKey}`;
+		if (updateObj[key as K] && typeof updateObj[key as K] === 'object') {
+			if (store.booMap[keyToFind]) {
+				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
 			} else {
-				throw new Error('you should wrap this value with peeka - where is triggering error is:' + currKey);
+				update<U[K]>(store, updateObj[key as K], currKey);
 			}
-
-			return acc;
-		},
-		{} as Record<K, unknown>
-	);
+		} else {
+			// data is primitivetype
+			if (store.booMap[keyToFind]) {
+				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
+			} else {
+				// but there are no existing boo.
+				console.error('path [' + currKey + '] does not exist. You need to set init structure for this first.');
+			}
+		}
+	});
 };
 
 function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(initData: U): PeekabooObj<U> {
@@ -116,20 +117,6 @@ function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(i
 	};
 }
 
-const wrap = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(obj: U) => {
-	return Object.keys(obj).reduce(
-		(acc, key) => {
-			if (obj[key as K] && typeof obj[key as K] === 'object') {
-				acc[key as K] = wrap(obj[key as K]);
-			} else {
-				acc[key as K] = peeka(obj[key as K]);
-			}
-
-			return acc;
-		},
-		{} as Record<K, unknown>
-	);
-};
 function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	peekaboo: PeekabooObj<U>,
 	initData: U
@@ -138,10 +125,7 @@ function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 		throw new Error('Peekaboo initData must be an object');
 	}
 	const store = peekaboo.store;
-	const wrappedData = wrap(initData) as unknown as U;
-
-	const newData = update<U>(store, wrappedData, '') as unknown as PeekabooParsed<U>;
-	peekaboo.data = newData;
+	update<U>(store, initData, '');
 
 	if (window !== undefined) {
 		window.dispatchEvent(
@@ -181,17 +165,13 @@ function getUsageLog(peekaboo: PeekabooObj<Record<string, any>>) {
 	recurrsiveLogging(peekaboo.data as Record<string, PeekabooParsed<any>>, logs);
 	return logs;
 }
-function createSlice<
-	U extends { [Key in keyof U & `_${string}`]: U[Key] },
-	T extends { [Key in keyof T & `_${string}`]: T[Key] },
-	K extends PeekabooParsed<T>,
->(peekaboo: PeekabooObj<U>, sliceFunc: (_peekabooData: PeekabooParsed<U>) => K) {
+
+function createSlice<U extends { [Key in keyof U & `_${string}`]: U[Key] }, T extends unknown>(
+	peekaboo: PeekabooObj<U>,
+	sliceFunc: (_peekabooData: PeekabooObj<U>['data']) => T
+) {
 	return () => {
-		try {
-			return sliceFunc(peekaboo.data);
-		} catch (e) {
-			return;
-		}
+		return sliceFunc(peekaboo.data) as T;
 	};
 }
 

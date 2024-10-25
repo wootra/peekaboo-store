@@ -1,6 +1,7 @@
 type Store = {
 	storeId: `peekabooStore-${number}`;
 	data: Record<string, unknown>;
+	booMap: Record<string, BooType<unknown>>;
 };
 
 type PeekaType<K> = {
@@ -24,6 +25,8 @@ type BooType<T> = Readonly<{
 	used: () => boolean;
 }>;
 
+type BooDataType<T> = T extends BooType<infer X> ? X : never;
+
 type PeekabooParsed<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T>
 		? BooType<T>
@@ -43,4 +46,14 @@ type PeekabooObj<U> = {
 	data: PeekabooParsed<U>;
 };
 
-export type { Store, BooType, PeekabooParsed, PeekabooObj, Setter, PeekabooMap, PeekaType, CreateSliceType };
+export type {
+	Store,
+	BooType,
+	PeekabooParsed,
+	PeekabooObj,
+	Setter,
+	PeekabooMap,
+	PeekaType,
+	CreateSliceType,
+	BooDataType,
+};

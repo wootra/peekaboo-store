@@ -13,6 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<Link href={'/dynamic'} className={styles.link}>
 						Network loaded init data
 					</Link>
+					<Link href={'/sample1'} className={styles.link}>
+						Sample1
+					</Link>
 				</nav>
 				{children}
 				<LinkStyler className={styles.link} />

@@ -18,6 +18,14 @@ Jotai or Redux Toolkit can be a solution that share some variable, but to find w
 
 With peekaboo-store, we will have full-typescript support for the data structure.
 
+## Power of peekaboo-store
+
+- event driven content update
+- content organize(manage your CMS system)
+- dynamic content update
+- tree shaking
+
+
 ## Demo
 
 - [DemoCode(React - Next.js)](https://github.com/wootra/peekaboo-store/tree/main/apps/demo)
@@ -27,3 +35,52 @@ With peekaboo-store, we will have full-typescript support for the data structure
 
 Peekaboo store update contents powered by custom event. It updates really fast. 
 
+## Architecture shift
+
+Organizing files and folders consumes so much time. And it is even harder to track if the contents are even still used!
+With `peekaboo-store`, You can track all the contents in one or very smaller files and they are "type safe"!
+`peekaboo-store` also supports dynamic loading content. 
+
+### make content structure
+
+Imagine you have 
+
+```typescript
+import { createPeekaboo } from 'peekaboo-store';
+
+const contents = {
+	header: {
+		languageDropdown: 'kr',
+		title: {
+			image: '/images/home.jpg',
+			ariaLabel: 'welcome',
+		},
+		menus: {
+			home: {
+				label: 'Home',
+				link: '/home',
+			},
+			about: {
+				label: 'About',
+				link: '/about',
+			},
+		},
+	},
+	contents: {
+		aboutPage: {
+			title: 'Title-about',
+			introduction: 'we are...(some random text)',
+		},
+		homePage: {
+			title: 'Title-home',
+			hero: {
+				image: '/images/hero.jpg',
+				text: 'Hello! we are...',
+			},
+		},
+	},
+};
+const contentPeekaboo = createPeekaboo(contents);
+export { contentPeekaboo };
+
+```
