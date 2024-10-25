@@ -34,5 +34,4 @@ const peeks = {
 		},
 	},
 };
-
 export const peekaboo = createPeekaboo(peeks);

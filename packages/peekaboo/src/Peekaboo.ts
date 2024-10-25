@@ -1,5 +1,5 @@
 import { INIT_VALUE, UPDATE_VALUE } from './consts';
-import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store } from './types';
+import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store, PeekabooObjSourceData } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
@@ -19,6 +19,12 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 	store.data[booId] = initValue;
 	let isUsed = false;
 	const set = (newValue: T) => {
+		if (typeof newValue !== typeof initValue) {
+			console.warn(
+				`[${booIdSrc}] Type mismatch. Expected ${typeof initValue} but got ${typeof newValue}. ignoring...`
+			);
+			return;
+		}
 		store.data[booId] = newValue;
 		if (window !== undefined) {
 			window.dispatchEvent(
@@ -33,6 +39,12 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 		}
 	};
 	const __initialize = (newVal?: T) => {
+		if (typeof newVal !== typeof initValue) {
+			console.warn(
+				`[${booIdSrc}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
+			);
+			return;
+		}
 		initValue = newVal !== undefined ? newVal : initValue;
 		isUsed = false;
 		store.data[booId] = newVal;
@@ -79,7 +91,7 @@ const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = key
 
 const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
 	store: Store,
-	updateObj: U,
+	updateObj: Partial<PeekabooObjSourceData<PeekabooObj<U>>>,
 	parentKey: string
 ) => {
 	Object.keys(updateObj).forEach(key => {
@@ -89,7 +101,7 @@ const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyo
 			if (store.booMap[keyToFind]) {
 				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
 			} else {
-				update<U[K]>(store, updateObj[key as K], currKey);
+				update<U[K]>(store, updateObj[key as K] as Partial<U[K]>, currKey);
 			}
 		} else {
 			// data is primitivetype
@@ -97,7 +109,7 @@ const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyo
 				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
 			} else {
 				// but there are no existing boo.
-				console.error('path [' + currKey + '] does not exist. You need to set init structure for this first.');
+				console.warn('path [' + currKey + '] does not exist. You need to set init structure for this first.');
 			}
 		}
 	});
@@ -119,7 +131,7 @@ function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(i
 
 function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	peekaboo: PeekabooObj<U>,
-	initData: U
+	initData: Partial<PeekabooObjSourceData<PeekabooObj<U>>>
 ): void {
 	if (!initData || typeof initData !== 'object') {
 		throw new Error('Peekaboo initData must be an object');

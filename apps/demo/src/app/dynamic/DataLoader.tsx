@@ -1,9 +1,9 @@
 'use client';
 
-import { updatePeekaboo } from 'peekaboo-store';
+import { PeekabooObjSourceData, updatePeekaboo } from 'peekaboo-store';
 import { useEffect } from 'react';
 import { peekaboo } from './_data/const';
-const mockData: any = {
+const mockData: Partial<PeekabooObjSourceData<typeof peekaboo>> = {
 	routes: {
 		page1: {
 			header: {
@@ -13,8 +13,15 @@ const mockData: any = {
 		},
 		page2: {
 			header: {
-				title: 'page2-header-title',
+				// @ts-ignore
+				title: 3,
 				subTitle: 'page2-header-subtitle',
+			},
+		},
+		extra: {
+			header: {
+				title: 'extra-header-title',
+				subTitle: 'extra-header-subtitle',
 			},
 		},
 	},

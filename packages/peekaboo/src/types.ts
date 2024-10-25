@@ -46,6 +46,12 @@ type PeekabooObj<U> = {
 	data: PeekabooParsed<U>;
 };
 
+type OrgTypes<K> = {
+	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? T : OrgTypes<K[Key]>;
+};
+
+type PeekabooObjSourceData<U> = U extends PeekabooObj<infer T> ? OrgTypes<T> : U;
+
 export type {
 	Store,
 	BooType,
@@ -56,4 +62,5 @@ export type {
 	PeekaType,
 	CreateSliceType,
 	BooDataType,
+	PeekabooObjSourceData,
 };
