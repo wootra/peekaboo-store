@@ -21,10 +21,10 @@ With peekaboo-store, we will have full-typescript support for the data structure
 ## Power of peekaboo-store
 
 - event driven content update
-- content organize(manage your CMS system)
-- dynamic content update
-- tree shaking
-
+- content organize(manage your CMS system). hook managed labels will help you to update your SPA without full-reload.
+- dynamic full content update support
+- default value decides type automatically.
+- very simple usage ( minimum boilerplate ). No Provider needed!
 
 ## Demo
 
@@ -41,9 +41,9 @@ Organizing files and folders consumes so much time. And it is even harder to tra
 With `peekaboo-store`, You can track all the contents in one or very smaller files and they are "type safe"!
 `peekaboo-store` also supports dynamic loading content. 
 
-### make content structure
+### make a content schema
 
-Imagine you have 
+Imagine you have content structure like below. For example, 
 
 ```typescript
 import { createPeekaboo } from 'peekaboo-store';
@@ -52,6 +52,7 @@ const contents = {
 	header: {
 		languageDropdown: 'kr',
 		title: {
+			label: 'Title',
 			image: '/images/home.jpg',
 			ariaLabel: 'welcome',
 		},
@@ -84,3 +85,29 @@ const contentPeekaboo = createPeekaboo(contents);
 export { contentPeekaboo };
 
 ```
+
+`createPeekaboo` creates Peekaboo object. And this object can be shared everywhere. There is no limitation of number of stores. You can make multiple if you want to manage the content based on pages.
+
+You can consume the data like this:
+
+```typescript
+import { contentPeekaboo } from 'app/sample1/_data/constant';
+import { usePeekaboo } from 'peekaboo-store/react';
+
+const Header = () => {
+	const header = usePeekaboo(contentPeekaboo.data.header.title);
+
+	return (
+		<div>
+			<h1>{header.label}</h1>
+			<p>{header.image}</p>
+		</div>
+	);
+};
+
+export default Header;
+```
+
+Is `contentPeekaboo.data.header.title` too long? Don't be nervous. It will support typescript.
+![peekaboo object is fully type supported](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/use-peekaboo-type-support.png?raw=true)
+
