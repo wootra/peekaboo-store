@@ -5,7 +5,8 @@ import Updated from 'components/Updated';
 
 import Trigger from 'components/Trigger';
 import { peekaboo } from 'app/dynamic/_data/const';
-import { createSlice, getUsageLog } from 'peekaboo-store';
+import { createSlice } from 'peekaboo-store/utils/slices';
+import { getUsageLog } from 'peekaboo-store/utils/usage';
 
 const page2HeaderSlice = createSlice(peekaboo, data => data.routes.page2.header);
 const titles = ['title1', 'title2'];

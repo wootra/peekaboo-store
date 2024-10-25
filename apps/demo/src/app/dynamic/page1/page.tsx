@@ -4,7 +4,8 @@ import React from 'react';
 import Updated from 'components/Updated';
 import { peekaboo } from 'app/dynamic/_data/const';
 import Trigger from 'components/Trigger';
-import { BooDataType, createSlice } from 'peekaboo-store';
+import { BooDataType } from 'peekaboo-store';
+import { createSlice } from 'peekaboo-store/utils/slices';
 const page1HeaderSlice = createSlice(peekaboo, data => data.routes.page1.header);
 const titles: BooDataType<ReturnType<typeof page1HeaderSlice>>[] = [
 	{

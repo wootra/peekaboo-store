@@ -1,5 +1,5 @@
-import { INIT_VALUE, UPDATE_VALUE } from './consts';
-import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store, PeekabooObjSourceData } from './types';
+import { UPDATE_VALUE } from './consts';
+import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
@@ -89,32 +89,6 @@ const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = key
 	);
 };
 
-const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
-	store: Store,
-	updateObj: Partial<PeekabooObjSourceData<PeekabooObj<U>>>,
-	parentKey: string
-) => {
-	Object.keys(updateObj).forEach(key => {
-		const currKey = parentKey ? `${parentKey}.${key}` : key;
-		const keyToFind = `${store.storeId}-${currKey}`;
-		if (updateObj[key as K] && typeof updateObj[key as K] === 'object') {
-			if (store.booMap[keyToFind]) {
-				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
-			} else {
-				update<U[K]>(store, updateObj[key as K] as Partial<U[K]>, currKey);
-			}
-		} else {
-			// data is primitivetype
-			if (store.booMap[keyToFind]) {
-				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
-			} else {
-				// but there are no existing boo.
-				console.warn('path [' + currKey + '] does not exist. You need to set init structure for this first.');
-			}
-		}
-	});
-};
-
 function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(initData: U): PeekabooObj<U> {
 	const store = createStore();
 	if (!initData || typeof initData !== 'object') {
@@ -129,27 +103,6 @@ function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(i
 	};
 }
 
-function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
-	peekaboo: PeekabooObj<U>,
-	initData: Partial<PeekabooObjSourceData<PeekabooObj<U>>>
-): void {
-	if (!initData || typeof initData !== 'object') {
-		throw new Error('Peekaboo initData must be an object');
-	}
-	const store = peekaboo.store;
-	update<U>(store, initData, '');
-
-	if (window !== undefined) {
-		window.dispatchEvent(
-			new CustomEvent(INIT_VALUE, {
-				detail: {
-					storeId: store.storeId,
-				},
-			})
-		);
-	}
-}
-
 function peeka<T>(value: T): PeekaType<T> {
 	return {
 		peekabooType: 'peeka',
@@ -157,34 +110,4 @@ function peeka<T>(value: T): PeekaType<T> {
 	};
 }
 
-type MapOrBoolean = Record<string, boolean> | boolean;
-type RecurrsiveLogMap = Record<string, MapOrBoolean | Record<string, MapOrBoolean>>;
-
-function getUsageLog(peekaboo: PeekabooObj<Record<string, any>>) {
-	const logs = {} as RecurrsiveLogMap;
-	const recurrsiveLogging = (data: Record<string, PeekabooParsed<any>>, child: RecurrsiveLogMap) => {
-		Object.keys(data).forEach(key => {
-			if (data[key] && typeof data[key] === 'object') {
-				if ('used' in data[key] && typeof data[key].used === 'function') {
-					child[key] = (data[key].used as () => boolean)() as boolean;
-				} else {
-					child[key] = {};
-					recurrsiveLogging(data[key] as Record<string, PeekabooParsed<any>>, child[key]);
-				}
-			}
-		});
-	};
-	recurrsiveLogging(peekaboo.data as Record<string, PeekabooParsed<any>>, logs);
-	return logs;
-}
-
-function createSlice<U extends { [Key in keyof U & `_${string}`]: U[Key] }, T extends unknown>(
-	peekaboo: PeekabooObj<U>,
-	sliceFunc: (_peekabooData: PeekabooObj<U>['data']) => T
-) {
-	return () => {
-		return sliceFunc(peekaboo.data) as T;
-	};
-}
-
-export { createPeekaboo, updatePeekaboo, peeka, getUsageLog, update, createSlice };
+export { createPeekaboo, peeka };

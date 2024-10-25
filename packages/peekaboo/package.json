@@ -12,15 +12,22 @@
 	"exports2": {
 		".": "./src/index.ts",
 		"./react": "./src/react/index.ts",
-		"./vanilla": "./src/vanilla/index.ts"
+		"./vanilla": "./src/vanilla/index.ts",
+		"./utils/slices": "./src/utils/slices.ts",
+		"./utils/update": "./src/utils/update.ts",
+		"./utils/usage": "./src/utils/usage.ts"
 	},
 	"exports": {
 		".": "./dist/index.mjs",
 		"./react": "./dist/react/index.mjs",
-		"./vanilla": "./dist/vanilla/index.mjs"
+		"./vanilla": "./dist/vanilla/index.mjs",
+		"./utils/slices": "./dist/utils/slices.mjs",
+		"./utils/update": "./dist/utils/update.mjs",
+		"./utils/usage": "./dist/utils/usage.mjs"
 	},
 	"scripts": {
 		"build": "tsup",
+		"build:size": "size-limit",
 		"clear": "rm -rf dist",
 		"dev": "pnpm run build --watch",
 		"lint": "eslint \"src/**/*.ts*\"",
@@ -36,6 +43,9 @@
 	"devDependencies": {
 		"@acme/eslint-config": "workspace:*",
 		"@acme/tsconfig": "workspace:*",
+		"@size-limit/preset-app": "^11.1.6",
+		"@size-limit/preset-big-lib": "^11.1.6",
+		"@size-limit/preset-small-lib": "^11.1.6",
 		"@types/react": "^18.2.61",
 		"@types/react-dom": "^18.2.19",
 		"@typescript-eslint/eslint-plugin": "^8.6.0",
@@ -43,6 +53,7 @@
 		"@vitejs/plugin-react": "^4.3.3",
 		"eslint": "^8.57.0",
 		"eslint-config-standard-with-typescript": "^43.0.1",
+		"size-limit": "^11.1.6",
 		"tsup": "^8.0.2",
 		"typescript": "^5.6.2",
 		"vite": "^5.4.9",
@@ -59,6 +70,38 @@
 	"publishConfig": {
 		"access": "public"
 	},
+	"size-limit": [
+		{
+			"path": "./dist/index.mjs",
+			"import": "*",
+			"limit": "500 ms"
+		},
+		{
+			"path": "./dist/react/index.mjs",
+			"import": "*",
+			"limit": "500 ms"
+		},
+		{
+			"path": "./dist/vanilla/index.mjs",
+			"import": "*",
+			"limit": "500 ms"
+		},
+		{
+			"path": "./dist/utils/slices.mjs",
+			"import": "*",
+			"limit": "500 ms"
+		},
+		{
+			"path": "./dist/utils/update.mjs",
+			"import": "*",
+			"limit": "500 ms"
+		},
+		{
+			"path": "./dist/utils/usage.mjs",
+			"import": "*",
+			"limit": "500 ms"
+		}
+	],
 	"keywords": [
 		"react",
 		"state",

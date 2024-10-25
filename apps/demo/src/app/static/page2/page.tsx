@@ -5,7 +5,8 @@ import Updated from 'components/Updated';
 
 import Trigger from 'components/Trigger';
 import { peekaboo } from 'app/static/_data/const';
-import { createSlice, getUsageLog } from 'peekaboo-store';
+import { createSlice } from 'peekaboo-store/utils/slices';
+import { getUsageLog } from 'peekaboo-store/utils/usage';
 
 const page2Slice = createSlice(peekaboo, data => data.routes.page2);
 

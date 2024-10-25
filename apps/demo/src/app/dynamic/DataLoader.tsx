@@ -1,8 +1,9 @@
 'use client';
 
-import { PeekabooObjSourceData, updatePeekaboo } from 'peekaboo-store';
 import { useEffect } from 'react';
 import { peekaboo } from './_data/const';
+import { PeekabooObjSourceData } from 'peekaboo-store';
+import { updatePeekaboo } from 'peekaboo-store/utils/update';
 const mockData: Partial<PeekabooObjSourceData<typeof peekaboo>> = {
 	routes: {
 		page1: {

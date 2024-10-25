@@ -20,6 +20,7 @@ With peekaboo-store, we will have full-typescript support for the data structure
 
 ## Power of peekaboo-store
 
+- lightweight! (core is 544B)
 - event driven content update
 - content organize(manage your CMS system). hook managed labels will help you to update your SPA without full-reload.
 - dynamic full content update support
@@ -41,7 +42,7 @@ Organizing files and folders consumes so much time. And it is even harder to tra
 With `peekaboo-store`, You can track all the contents in one or very smaller files and they are "type safe"!
 `peekaboo-store` also supports dynamic loading content. 
 
-### make a content schema
+### make a content schema (createPeekaboo)
 
 Imagine you have content structure like below. For example, 
 
@@ -88,7 +89,7 @@ export { contentPeekaboo };
 
 `createPeekaboo` creates Peekaboo object. And this object can be shared everywhere. There is no limitation of number of stores. You can make multiple if you want to manage the content based on pages.
 
-### consume data
+### consume data (usePeekaboo)
 
 You can consume the data like this:
 
@@ -115,7 +116,7 @@ Is `contentPeekaboo.data.header.title` too long? Don't be nervous. It will suppo
 
 ![peekaboo object is fully type supported](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/use-peekaboo-type-support.png?raw=true)
 
-## Slice
+## Slice (createSlice)
 
 Still annoying? Do you have to re-use it? No problem! use Slice.
 
@@ -128,7 +129,7 @@ const Header = () => {
     ...
 ```
 
-## Use content as Object
+## Use content as Object (peeka)
 
 `peekaboo-store` is designed to be optimized to manage CMS contents. So if it is handling string, it makes sense. It also support `usageLog` that is useful to check if the labels are actually used or not.
 But If you're lazy, and you know the labels or contents are always used together, then you can wrap it with `peeka` function when you initialize data schema.
@@ -200,7 +201,7 @@ export default Header;
 
 If you use peeka function, you can wrap any of object (even jotai atom!).
 
-## Dynamic update full contents
+## Dynamic update full contents (updatePeekaboo)
 
 `peekaboo-store` supports full or partial content update by simple function call.
 Below is a simple example updating peekaboo object with a new data.

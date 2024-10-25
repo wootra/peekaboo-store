@@ -4,7 +4,7 @@ import React from 'react';
 import Updated from 'components/Updated';
 import { peekaboo } from 'app/static/_data/const';
 import Trigger from 'components/Trigger';
-import { createSlice } from 'peekaboo-store';
+import { createSlice } from 'peekaboo-store/utils/slices';
 const page1HeaderSlice = createSlice(peekaboo, data => data.routes.page1.header);
 function Page() {
 	return (
