@@ -1,45 +1,89 @@
 import { UPDATE_VALUE } from './consts';
-import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store, UpdateDetail } from './types';
+import {
+	PeekaType,
+	PeekabooObj,
+	PeekabooParsed,
+	BooType,
+	Store,
+	UpdateDetail,
+	BooTypeBase,
+	LeafBooType,
+	BranchBooType,
+	BooKeyTypes,
+} from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
-const createStore = (): Store => {
+const createStore = <T>(clonedData: T): Store => {
 	const storeId = storeIdBase++;
 
 	return {
 		storeId: `peekabooStore-${storeId}`,
 		booMap: {},
+		savedData: clonedData,
 		data: {},
+		parentMap: {},
 	};
+};
+const createBooUid = (store: Store, booId: string) => `${store.storeId}-${booId}`;
+
+const getChildSet = <U>(obj: Record<keyof U, BooType<U[keyof U]>>, set: Set<string> = new Set<string>()) => {
+	Object.keys(obj).forEach(key => {
+		const boo = obj[key as keyof typeof obj];
+		set.add(boo.__booUId);
+		if ('__childrenBoo' in boo) {
+			getChildSet(boo.__childrenBoo as Record<keyof U, BooType<U[keyof U]>>, set);
+		}
+	});
+	return set;
 };
 
 const createValueObj = <T>(
-	store: Store,
+	__store: Store,
 	value: PeekaType<T>,
-	booIdSrc: string,
-	childrenSet: Set<string> = new Set<string>()
-): BooType<T> => {
-	const booId = `${store.storeId}-${booIdSrc}`;
+	parentKey: string,
+	booKey: string,
+	__childrenBoo: Record<keyof T, BooType<T[keyof T]>> | null = null
+) => {
+	const __booId = parentKey ? `${parentKey}.${booKey}` : booKey;
+	const __booUId = createBooUid(__store, __booId);
+	const __parentUId = createBooUid(__store, parentKey);
 	let initValue = value.init;
-	store.data[booId] = initValue;
+
 	let isUsed = false;
 	let isEverUsed = false;
-	const idSet = new Set<string>(childrenSet);
-	idSet.add(booId);
+
+	const __booType = __childrenBoo === null ? 'leaf' : 'branch';
+	__store.data[__booUId] = initValue;
+	const idSet = __childrenBoo === null ? new Set<string>() : getChildSet<T>(__childrenBoo);
+	idSet.add(__booUId);
+
 	const set = (newValue: T) => {
 		if (typeof newValue !== typeof initValue) {
 			console.warn(
-				`[${booIdSrc}] Type mismatch. Expected ${typeof initValue} but got ${typeof newValue}. ignoring...`
+				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newValue}. ignoring...`
 			);
 			return;
 		}
-		store.data[booId] = newValue;
+		if (__booType === 'branch' && __childrenBoo) {
+			Object.keys(__childrenBoo).forEach(key => {
+				if (newValue && typeof newValue === 'object' && typeof key === 'string') {
+					// @ts-ignore
+					__childrenBoo[key as keyof T].set(newValue[key]);
+				}
+			});
+		} else {
+			// when leaf node, update actual data in the reference.
+			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+				(__store.data[__parentUId] as any)[__booUId] = newValue; // only leaf will update the value
+			}
+		}
 		if (window !== undefined) {
 			window.dispatchEvent(
 				new CustomEvent(UPDATE_VALUE, {
 					detail: {
 						idSet: idSet,
-						storeId: store.storeId,
+						storeId: __store.storeId,
 						current: newValue,
 					} as UpdateDetail<T>,
 				})
@@ -49,63 +93,181 @@ const createValueObj = <T>(
 	const __initialize = (newVal?: T) => {
 		if (typeof newVal !== typeof initValue) {
 			console.warn(
-				`[${booIdSrc}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
+				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
 			);
 			return;
 		}
 		initValue = newVal !== undefined ? newVal : initValue;
+
+		if (typeof newVal !== typeof initValue) {
+			console.warn(
+				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
+			);
+			return;
+		}
+		if (__booType === 'branch' && __childrenBoo) {
+			Object.keys(__childrenBoo).forEach(key => {
+				if (newVal && typeof newVal === 'object' && typeof key === 'string') {
+					// @ts-ignore
+					__childrenBoo[key as keyof T].__initialize(newVal[key]);
+				}
+			});
+		} else {
+			// when leaf node, update actual data in the reference.
+			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+				(__store.data[__parentUId] as any)[__booUId] = newVal; // only leaf will update the value
+			}
+		}
+
 		isUsed = false;
-		store.data[booId] = newVal;
 	};
 
-	store.booMap[booId] = Object.freeze({
-		store,
-		booId,
+	const __used = () => {
+		return isUsed;
+	};
+
+	const __allUsed = () => {
+		return isUsed;
+	};
+
+	const __everUsed = () => {
+		return isEverUsed;
+	};
+
+	const __allEverUsed = () => {
+		return isEverUsed;
+	};
+
+	const get = () => {
+		isUsed = true;
+		isEverUsed = true;
+		if (__booType === 'leaf') {
+			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+				return (__store.data[__parentUId] as any)[__booUId] as T; // only leaf will update the value
+			}
+		}
+		return __store.data[__booUId] as T;
+	};
+
+	const commonBoo: BooTypeBase<T> = {
+		__store,
+		__booUId,
+		__booId,
 		init: () => initValue,
-		used: () => isUsed,
-		everUsed: () => isEverUsed,
+		__used,
+		__allUsed,
+		__everUsed,
+		__allEverUsed,
 		__initialize,
-		get: () => {
-			isUsed = true;
-			isEverUsed = true;
-			return store.data[booId] as T;
-		},
-		childrenSet,
+		get,
 		set,
-	}) as BooType<unknown>;
-	return store.booMap[booId] as BooType<T>;
+	} as const;
+	if (__booType === 'leaf') {
+		const boo: LeafBooType<T> = Object.freeze({
+			...commonBoo,
+			__booType,
+		});
+
+		__store.booMap[__booUId] = boo as BooType<unknown>;
+		return boo;
+	} else {
+		if (typeof value.init !== 'object') {
+			throw new Error('branch boo should have object value only.');
+		}
+		if (!__childrenBoo) {
+			throw new Error('__changeSet should not be null in this case.');
+		}
+		const keysToFilter = new Set([...Object.keys(commonBoo), '__booType', '__childrenBoo'] as BooKeyTypes<T>[]);
+		const includedProhibitedKeys = Object.keys(value.init as object).filter(key =>
+			keysToFilter.has(key as BooKeyTypes<T>)
+		);
+		if (includedProhibitedKeys.length > 0) {
+			throw new Error(
+				'Peekaboo object cannot have keys that are reserved for peekaboo. what you have: [' +
+					includedProhibitedKeys.join(', ') +
+					']'
+			);
+		}
+		const boo: BranchBooType<T> = Object.freeze({
+			...commonBoo,
+			__booType,
+			__childrenBoo,
+		}) as BranchBooType<T>;
+		__store.booMap[__booUId] = boo as BooType<unknown> & { __booType: 'branch' };
+		return boo;
+	}
 };
 
-const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
-	store: Store,
-	obj: U,
-	parentKey: string
-) => {
+const convert = <U extends { [Key in keyof U]: U[Key] }>(store: Store, obj: U, parentKey: string) => {
 	return Object.keys(obj).reduce(
 		(acc, key) => {
 			const currKey = parentKey ? `${parentKey}.${key}` : key;
-			if (obj[key as K] && typeof obj[key as K] === 'object') {
-				if ('peekabooType' in obj[key as K] && (obj[key as K] as PeekaType<any>).peekabooType === 'peeka') {
-					acc[key as K] = createValueObj(store, obj[key as K], currKey); // no childrenSet
+			const currUID = createBooUid(store, currKey);
+			if (obj[key as keyof U] && typeof obj[key as keyof U] === 'object') {
+				if (
+					'peekabooType' in obj[key as keyof U] &&
+					(obj[key as keyof U] as PeekaType<any>).peekabooType === 'peeka'
+				) {
+					acc[key as keyof U] = createValueObj(store, obj[key as keyof U], parentKey, key) as BooType<
+						U[keyof U]
+					>; // no childrenSet
 				} else {
-					acc[key as K] = convert(store, obj[key as K], currKey);
+					const parent = convert(store, obj[key as keyof U], currKey);
+
+					acc[key as keyof U] = {
+						...(createValueObj(store, peeka(obj[key as keyof U]), parentKey, key, parent) as BooType<
+							U[keyof U]
+						>),
+						...parent,
+					};
+					Object.keys(parent).forEach(key => {
+						const child = parent[key as keyof U];
+						if ('__booUId' in child) {
+							store.parentMap[child.__booUId as string] = currUID;
+						}
+					});
 				}
 			} else {
-				acc[key as K] = createValueObj(store, peeka(obj[key as K]), currKey);
+				acc[key as keyof U] = createValueObj(store, peeka(obj[key as keyof U]), parentKey, key);
 			}
 
 			return acc;
 		},
-		{} as Record<K, unknown>
+		{} as Record<
+			keyof U,
+			| BooType<U[keyof U]>
+			| (BooType<U[keyof U]> & Record<keyof U[keyof U], BooType<U[keyof U][keyof U[keyof U]]>>)
+		>
 	);
 };
 
+function cloneInitData<T extends Record<string, any>>(
+	initData: Record<keyof T, T[keyof T]>,
+	dest: any = {}
+): Record<keyof T, T[keyof T]> {
+	for (const key in initData) {
+		if (typeof initData[key] === 'object') {
+			if ((initData[key] as PeekaType<T[keyof T]>).peekabooType === 'peeka') {
+				dest[key] = initData[key];
+			} else {
+				if (!dest[key]) {
+					dest[key] = {} as T[keyof T];
+				}
+				dest[key] = cloneInitData(initData[key as keyof T] as T[keyof T], dest[key]);
+			}
+		} else {
+			dest[key] = initData[key];
+		}
+	}
+	return dest as Record<keyof T, T[keyof T]>;
+}
+
 function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(initData: U): PeekabooObj<U> {
-	const store = createStore();
 	if (!initData || typeof initData !== 'object') {
 		throw new Error('Peekaboo initData must be an object');
 	}
-
+	const cloned = cloneInitData(initData);
+	const store = createStore(cloned);
 	const converted = convert<U>(store, initData, '') as unknown as PeekabooParsed<U>;
 
 	return {

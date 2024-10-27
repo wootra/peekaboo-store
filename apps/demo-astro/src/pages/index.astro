@@ -47,7 +47,6 @@ import Layout from '../layouts/Layout.astro';
 	const header1Btns = document.querySelectorAll('#header1 .btn');
 	for(let i=0; i<header1Btns.length; i++){
 		header1Btns.item(i).addEventListener('click', (e)=>{
-			console.log((e.target as HTMLDivElement).dataset["val"]);
 			const val = (e.target as HTMLDivElement).dataset["val"] ?? "-1";
 			store.data.header1.set(parseInt(val));
 		});
@@ -67,7 +66,6 @@ import Layout from '../layouts/Layout.astro';
 	});
 	
 	usePeekaboo(store.data.header1, (v)=>{
-		console.log("event triggered!", v);
 		const el = document.querySelector('#header1 .content');
 		if(el){
 			el.innerHTML = `${v}`;
@@ -75,7 +73,6 @@ import Layout from '../layouts/Layout.astro';
 	});
 
 	usePeekaboo(store.data.header2.content, (v)=>{
-		console.log("event triggered!", v);
 		const el = document.querySelector('#header2 .content');
 		if(el){
 			el.innerHTML = `${v}`;

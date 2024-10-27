@@ -18,7 +18,6 @@ const LinkStyler = ({ className }: { className: string }) => {
 					link.classList.remove('active');
 				}
 			}
-			console.log('location', location);
 		}
 	}, [location]);
 	return null;

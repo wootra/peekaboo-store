@@ -1,24 +1,24 @@
-import { PeekabooObj, PeekabooParsed } from '../types';
+import { BooType, PeekabooObj } from '../types';
 
-type MapOrBoolean = Record<string, boolean> | boolean;
-type RecurrsiveLogMap = Record<string, MapOrBoolean | Record<string, MapOrBoolean>>;
+type UsageData = { __used: boolean; __allUsed: boolean; __everUsed: boolean; __allEverUsed: boolean };
 
-function getUsageLog(peekaboo: PeekabooObj<Record<string, any>>) {
-	const logs = {} as RecurrsiveLogMap;
-	const recurrsiveLogging = (data: Record<string, PeekabooParsed<any>>, child: RecurrsiveLogMap) => {
-		Object.keys(data).forEach(key => {
-			if (data[key] && typeof data[key] === 'object') {
-				if ('used' in data[key] && typeof data[key].used === 'function') {
-					child[key] = (data[key].used as () => boolean)() as boolean;
-				} else {
-					child[key] = {};
-					recurrsiveLogging(data[key] as Record<string, PeekabooParsed<any>>, child[key]);
-				}
+function getUsageLog<U>(peekaboo: PeekabooObj<U>, nodeType: 'leaf' | 'all' | 'branch') {
+	return Object.keys(peekaboo.store.booMap).reduce(
+		(acc, key) => {
+			const boo = peekaboo.store.booMap[key] as BooType<UsageData>;
+			const id = boo.__booId;
+			if (nodeType === 'all' || nodeType === boo.__booType) {
+				acc[id] = {
+					__used: boo.__used(),
+					__allUsed: boo.__allUsed(),
+					__everUsed: boo.__everUsed(),
+					__allEverUsed: boo.__allEverUsed(),
+				};
 			}
-		});
-	};
-	recurrsiveLogging(peekaboo.data as Record<string, PeekabooParsed<any>>, logs);
-	return logs;
+			return acc;
+		},
+		{} as Record<string, UsageData>
+	);
 }
 
 export { getUsageLog };

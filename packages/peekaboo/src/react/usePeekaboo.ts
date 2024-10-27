@@ -15,8 +15,10 @@ export const usePeekaboo = <T>(boo: BooType<T>) => {
 		const listener: EventListenerOrEventListenerObject = e => {
 			const ev = e as CustomEvent<UpdateDetail<T>>;
 			const shouldUpdate =
-				ev.type === UPDATE_VALUE && ev.detail.idSet.has(boo.booId) && ev.detail.storeId === boo.store.storeId;
-			const shouldInit = ev.type === INIT_VALUE && ev.detail.storeId === boo.store.storeId;
+				ev.type === UPDATE_VALUE &&
+				ev.detail.idSet.has(boo.__booUId) &&
+				ev.detail.storeId === boo.__store.storeId;
+			const shouldInit = ev.type === INIT_VALUE && ev.detail.storeId === boo.__store.storeId;
 			if (shouldUpdate || shouldInit) {
 				if (valRef.current === boo.get()) return;
 				setTimeout(() => {
