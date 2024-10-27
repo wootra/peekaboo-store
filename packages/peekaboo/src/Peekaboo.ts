@@ -1,5 +1,5 @@
 import { UPDATE_VALUE } from './consts';
-import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store } from './types';
+import { PeekaType, PeekabooObj, PeekabooParsed, BooType, Store, UpdateDetail } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
@@ -13,11 +13,19 @@ const createStore = (): Store => {
 	};
 };
 
-const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string): BooType<T> => {
+const createValueObj = <T>(
+	store: Store,
+	value: PeekaType<T>,
+	booIdSrc: string,
+	childrenSet: Set<string> = new Set<string>()
+): BooType<T> => {
 	const booId = `${store.storeId}-${booIdSrc}`;
 	let initValue = value.init;
 	store.data[booId] = initValue;
 	let isUsed = false;
+	let isEverUsed = false;
+	const idSet = new Set<string>(childrenSet);
+	idSet.add(booId);
 	const set = (newValue: T) => {
 		if (typeof newValue !== typeof initValue) {
 			console.warn(
@@ -30,10 +38,10 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 			window.dispatchEvent(
 				new CustomEvent(UPDATE_VALUE, {
 					detail: {
-						id: booId,
+						idSet: idSet,
 						storeId: store.storeId,
 						current: newValue,
-					},
+					} as UpdateDetail<T>,
 				})
 			);
 		}
@@ -55,11 +63,14 @@ const createValueObj = <T>(store: Store, value: PeekaType<T>, booIdSrc: string):
 		booId,
 		init: () => initValue,
 		used: () => isUsed,
+		everUsed: () => isEverUsed,
 		__initialize,
 		get: () => {
 			isUsed = true;
+			isEverUsed = true;
 			return store.data[booId] as T;
 		},
+		childrenSet,
 		set,
 	}) as BooType<unknown>;
 	return store.booMap[booId] as BooType<T>;
@@ -75,7 +86,7 @@ const convert = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = key
 			const currKey = parentKey ? `${parentKey}.${key}` : key;
 			if (obj[key as K] && typeof obj[key as K] === 'object') {
 				if ('peekabooType' in obj[key as K] && (obj[key as K] as PeekaType<any>).peekabooType === 'peeka') {
-					acc[key as K] = createValueObj(store, obj[key as K], currKey);
+					acc[key as K] = createValueObj(store, obj[key as K], currKey); // no childrenSet
 				} else {
 					acc[key as K] = convert(store, obj[key as K], currKey);
 				}

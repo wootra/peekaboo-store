@@ -23,6 +23,14 @@ type BooType<T> = Readonly<{
 	get: () => T;
 	set: Setter<T>;
 	used: () => boolean;
+	childrenSet: Set<string>;
+	everUsed: () => boolean;
+}>;
+
+type UpdateDetail<T> = Readonly<{
+	idSet: Set<string>;
+	storeId: string;
+	current: T;
 }>;
 
 type BooDataType<T> = T extends BooType<infer X> ? X : never;
@@ -63,4 +71,5 @@ export type {
 	CreateSliceType,
 	BooDataType,
 	PeekabooObjSourceData,
+	UpdateDetail,
 };

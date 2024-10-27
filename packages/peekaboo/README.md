@@ -251,3 +251,25 @@ export default DataLoader;
 ```
 
 ![error message for type mismatch](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/type-mismatch.png?raw=true)
+
+
+## Direct data access without using hook
+
+the real power comes out of event-driven update.
+But sometimes you need to access to the data as part of other logic without creating a hook.
+(i.e. from jotai atom logic)
+you can use `BooType.get()` function to get the data. like `get` function, you also can get `BooType.init()` function to get what was init value.
+like `BooType.get()` function you also can change the value of it. `BooType.set(value)` will update the Boo's value, and all the usePeekaboo hooks that is using this Boo will be triggered. `BooType.set` does not reset its usage which you can check by calling `BooType.used()` function. this `BooType.used()` function will return `true` if this BooType is referenced(`BooType.get()`) at least once. 
+
+[Demo for .get(), .init()](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/components/Updated.tsx)
+[Demo for .set()](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/components/Trigger.tsx)
+[Demo for .used() - getUsageLog](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/page2/page.tsx)
+## Initialize Boo
+
+You can intialize Boo with `BooType.__initialize` function. With the argument, you can set it with other value (initialize return value of `.used()` to `false`). This function is also called when `updatePeekaboo` is called as well. If `updatePeekaboo` updates partial data, only updated `Boo` will be initialized. Unlike `BooType.used()`, `BooType.everUsed()` will not be updated to `false` even though 
+
+## Content usage log
+
+[Demo for .used() - getUsageLog](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/page2/page.tsx)
+
+You 

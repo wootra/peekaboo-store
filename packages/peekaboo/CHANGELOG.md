@@ -12,3 +12,6 @@ add warning messages for type mismatch, does not exist update
 ## 1.2.0 (semi major update)
 split utils
 add size-limit
+
+## 1.3.0
+add everUsed function
