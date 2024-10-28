@@ -21,10 +21,10 @@ const peeks = {
 	atoms: atoms,
 	routes: {
 		page1: {
-			header: peeka({
+			header: {
 				title: 'page1-header-title(init)',
 				subTitle: 'page1-header-subtitle(init)',
-			}),
+			},
 		},
 		page2: {
 			header: {

@@ -28,7 +28,8 @@ export default function Page() {
 
 			{/* <div>{dropDownIndex}</div> */}
 			<h1>Web</h1>
-			<Updated boo={page1HeaderSlice()} />
+			<Updated boo={page1HeaderSlice().title} />
+			<Updated boo={page1HeaderSlice().subTitle} />
 		</div>
 	);
 }

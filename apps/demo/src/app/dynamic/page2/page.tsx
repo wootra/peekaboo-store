@@ -21,8 +21,8 @@ export default function Page() {
 		return new Array(10).fill(null).map((_, idx) => {
 			return (
 				<div key={`id_${idx}`}>
-					<Updated boo={page2HeaderSlice()} />
-					<Updated boo={page2HeaderSlice()} />
+					<Updated boo={page2HeaderSlice().subTitle} />
+					<Updated boo={page2HeaderSlice().title} />
 				</div>
 			);
 		});
