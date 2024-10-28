@@ -15,7 +15,7 @@ type PeekabooMap<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? PeekaType<T> : K[Key];
 };
 
-type Setter<T> = (_value: T) => void;
+type Setter<T> = (_value: T, _eventBubling?: boolean, _ignoreUpdate?: boolean) => void;
 
 type BooTypeBase<T> = Readonly<{
 	__store: Store;
@@ -53,9 +53,10 @@ type LeafBooType<T> = Readonly<
 type BooType<T> = LeafBooType<T> | BranchBooType<T>;
 
 type UpdateDetail<T> = Readonly<{
-	idSet: Set<string>;
+	idSet?: Set<string>;
 	storeId: string;
-	current: T;
+	current?: T;
+	forceRender?: boolean;
 }>;
 
 type BooDataType<T> = T extends BooType<infer X> ? X : never;

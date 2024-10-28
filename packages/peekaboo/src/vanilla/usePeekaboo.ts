@@ -12,7 +12,7 @@ export const usePeekaboo = <T>(boo: BooType<T>, setState: (_val: T) => void) => 
 
 		const shouldUpdate =
 			ev.type === UPDATE_VALUE &&
-			ev.detail.idSet.has(boo?.__booUId) &&
+			ev.detail.idSet?.has(boo?.__booUId) &&
 			ev.detail.storeId === boo?.__store.storeId;
 		const shouldInit = ev.type === INIT_VALUE && ev.detail.storeId === boo?.__store.storeId;
 		if (shouldUpdate || shouldInit) {

@@ -18,11 +18,11 @@ export default function Page() {
 		window.logUsed = () => getUsageLog(peekaboo);
 	}, []);
 	const arrays = useMemo(() => {
-		return new Array(1000).fill(null).map((_, idx) => {
+		return new Array(10).fill(null).map((_, idx) => {
 			return (
 				<div key={`id_${idx}`}>
-					<Updated boo={page2HeaderSlice().title} />
-					<Updated boo={page2HeaderSlice().subTitle} />
+					<Updated boo={page2HeaderSlice()} />
+					<Updated boo={page2HeaderSlice()} />
 				</div>
 			);
 		});

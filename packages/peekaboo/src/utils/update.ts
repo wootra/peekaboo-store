@@ -1,5 +1,5 @@
 import { INIT_VALUE } from '../consts';
-import { BooType, PeekabooObj, PeekabooObjSourceData, Store } from '../types';
+import { BooType, PeekabooObj, PeekabooObjSourceData, Store, UpdateDetail } from '../types';
 
 const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
 	store: Store,
@@ -39,9 +39,10 @@ function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 
 	if (window !== undefined) {
 		window.dispatchEvent(
-			new CustomEvent(INIT_VALUE, {
+			new CustomEvent<UpdateDetail<U>>(INIT_VALUE, {
 				detail: {
 					storeId: store.storeId,
+					forceRender: true,
 				},
 			})
 		);

@@ -58,24 +58,26 @@ const createValueObj = <T>(
 	const idSet = __childrenBoo === null ? new Set<string>() : getChildSet<T>(__childrenBoo);
 	idSet.add(__booUId);
 
-	const set = (newValue: T) => {
-		if (typeof newValue !== typeof initValue) {
+	const set = (newValue: T, eventBubling = true, ignoreUpdate = false) => {
+		if (typeof newValue !== typeof initValue && ignoreUpdate === false) {
 			console.warn(
 				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newValue}. ignoring...`
 			);
 			return;
 		}
-		if (__booType === 'branch' && __childrenBoo) {
-			Object.keys(__childrenBoo).forEach(key => {
-				if (newValue && typeof newValue === 'object' && typeof key === 'string') {
-					// @ts-ignore
-					__childrenBoo[key as keyof T].set(newValue[key]);
+		if (!ignoreUpdate) {
+			if (__booType === 'branch' && __childrenBoo) {
+				Object.keys(__childrenBoo).forEach(key => {
+					if (newValue && typeof newValue === 'object' && typeof key === 'string') {
+						// @ts-ignore
+						__childrenBoo[key as keyof T].set(newValue[key], false);
+					}
+				});
+			} else {
+				// when leaf node, update actual data in the reference.
+				if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+					(__store.data[__parentUId] as any)[booKey] = newValue; // only leaf will update the value
 				}
-			});
-		} else {
-			// when leaf node, update actual data in the reference.
-			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
-				(__store.data[__parentUId] as any)[__booUId] = newValue; // only leaf will update the value
 			}
 		}
 		if (window !== undefined) {
@@ -85,9 +87,16 @@ const createValueObj = <T>(
 						idSet: idSet,
 						storeId: __store.storeId,
 						current: newValue,
+						forceRender: ignoreUpdate,
 					} as UpdateDetail<T>,
 				})
 			);
+		}
+		if (eventBubling) {
+			const parentBoo = __store.booMap[__parentUId];
+			if (parentBoo) {
+				parentBoo.set(parentBoo.get(), true, true);
+			}
 		}
 	};
 	const __initialize = (newVal?: T) => {
@@ -98,7 +107,7 @@ const createValueObj = <T>(
 			return;
 		}
 		initValue = newVal !== undefined ? newVal : initValue;
-
+		__store.data[__booUId] = initValue;
 		if (typeof newVal !== typeof initValue) {
 			console.warn(
 				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
@@ -115,7 +124,7 @@ const createValueObj = <T>(
 		} else {
 			// when leaf node, update actual data in the reference.
 			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
-				(__store.data[__parentUId] as any)[__booUId] = newVal; // only leaf will update the value
+				(__store.data[__parentUId] as any)[booKey] = newVal; // only leaf will update the value
 			}
 		}
 
@@ -143,7 +152,7 @@ const createValueObj = <T>(
 		isEverUsed = true;
 		if (__booType === 'leaf') {
 			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
-				return (__store.data[__parentUId] as any)[__booUId] as T; // only leaf will update the value
+				return (__store.data[__parentUId] as any)[booKey] as T; // only leaf will update the value
 			}
 		}
 		return __store.data[__booUId] as T;
@@ -162,6 +171,7 @@ const createValueObj = <T>(
 		get,
 		set,
 	} as const;
+
 	if (__booType === 'leaf') {
 		const boo: LeafBooType<T> = Object.freeze({
 			...commonBoo,
