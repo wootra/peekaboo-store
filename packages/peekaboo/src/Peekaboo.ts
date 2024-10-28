@@ -85,7 +85,7 @@ const createValueObj = <T>(
 				Object.keys(__childrenBoo).forEach(key => {
 					if (newValue && typeof newValue === 'object' && typeof key === 'string') {
 						// @ts-ignore
-						__childrenBoo[key as keyof T].set(newValue[key], false);
+						__childrenBoo[key as keyof T]._boo.set(newValue[key], false);
 					}
 				});
 			} else {
@@ -123,6 +123,7 @@ const createValueObj = <T>(
 				return;
 			} else {
 				initValue = newVal !== undefined ? newVal : initValue;
+
 				__store.data[__booUId] = initValue;
 				Object.keys(__childrenBoo).forEach(key => {
 					if (newVal && typeof newVal === 'object' && typeof key === 'string') {
@@ -201,22 +202,15 @@ const createValueObj = <T>(
 		__store.booMap[__booUId] = boo as BooType<unknown>;
 		return boo;
 	} else {
-		if (typeof value.init !== 'object') {
+		if (!value?.init || typeof value.init !== 'object') {
 			throw new Error('branch boo should have object value only.');
 		}
 		if (!__childrenBoo) {
 			throw new Error('__changeSet should not be null in this case.');
 		}
-		const keysToFilter = new Set([...Object.keys(commonBoo), '__booType', '__childrenBoo'] as BooKeyTypes<T>[]);
-		const includedProhibitedKeys = Object.keys(value.init as object).filter(key =>
-			keysToFilter.has(key as BooKeyTypes<T>)
-		);
-		if (includedProhibitedKeys.length > 0) {
-			throw new Error(
-				'Peekaboo object cannot have keys that are reserved for peekaboo. what you have: [' +
-					includedProhibitedKeys.join(', ') +
-					']'
-			);
+
+		if ('_boo' in value.init) {
+			throw new Error('Peekaboo object cannot have __boo keys that are reserved for peekaboo.');
 		}
 		const boo: BranchBooType<T> = Object.freeze({
 			...commonBoo,
@@ -242,23 +236,28 @@ const convert = <U extends { [Key in keyof U]: U[Key] }>(store: Store, obj: U, p
 						_boo: createValueObj(store, obj[key as keyof U], parentKey, key) as BooType<U[keyof U]>,
 					}; // no childrenSet
 				} else {
-					const parent = convert(store, obj[key as keyof U], currKey);
-
+					const childrenBoo = convert(store, obj[key as keyof U], currKey);
 					acc[key as keyof U] = {
-						_boo: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key, parent) as BooType<
-							U[keyof U]
-						>,
-						...parent,
+						_boo: createValueObj(
+							store,
+							peekaAfterClean(obj[key as keyof U]),
+							parentKey,
+							key,
+							childrenBoo
+						) as BooType<U[keyof U]>,
+						...childrenBoo,
 					};
-					Object.keys(parent).forEach(key => {
-						const child = parent[key as keyof U];
+					Object.keys(childrenBoo).forEach(key => {
+						const child = childrenBoo[key as keyof U];
 						if ('__booUId' in child) {
 							store.parentMap[child.__booUId as string] = currUID;
 						}
 					});
 				}
 			} else {
-				acc[key as keyof U] = { _boo: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key) };
+				acc[key as keyof U] = {
+					_boo: createValueObj(store, peekaAfterClean(obj[key as keyof U]), parentKey, key),
+				};
 			}
 
 			return acc;
@@ -310,6 +309,30 @@ function peeka<T>(value: T): PeekaType<T> {
 	return {
 		peekabooType: 'peeka',
 		init: value,
+	};
+}
+
+const cleanChildren = <T>(value: any) => {
+	if (value && typeof value === 'object') {
+		if ((value as PeekaType<unknown>).peekabooType === 'peeka') {
+			return value.init;
+		} else {
+			Object.keys(value).forEach(key => {
+				value[key] = cleanChildren(value[key]);
+			});
+			return value; // keep the reference
+		}
+	} else {
+		return value;
+	}
+};
+
+function peekaAfterClean<T>(value: T): PeekaType<T> {
+	const afterClean = cleanChildren(value);
+
+	return {
+		peekabooType: 'peeka',
+		init: afterClean,
 	};
 }
 

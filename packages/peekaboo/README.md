@@ -87,7 +87,7 @@ export { contentPeekaboo };
 
 ```
 
-`createPeekaboo` creates Peekaboo object. And this object can be shared everywhere. There is no limitation of number of stores. You can make multiple if you want to manage the content based on pages.
+`createPeekaboo` creates Peekaboo object. And this object can be shared everywhere. There is no limitation of number of stores. You can make multiple if you want to manage the content based on pages. `peekaboo-store` will give you easy usage. Whereever you want to cut the data, use `._boo` to access to trackable `BooType` object. using `BooType`, you can either use hook, accessing to data with `.get()`, or set the data with `.set()`.
 
 ### consume data (usePeekaboo)
 
@@ -98,8 +98,8 @@ import { contentPeekaboo } from 'app/sample1/_data/constant';
 import { usePeekaboo } from 'peekaboo-store/react';
 
 const Header = () => {
-	const titleLabel = usePeekaboo(contentPeekaboo.data.header.title.label);
-	const titleImage = usePeekaboo(contentPeekaboo.data.header.title.image);
+	const titleLabel = usePeekaboo(contentPeekaboo.data.header.title.label._boo);
+	const titleImage = usePeekaboo(contentPeekaboo.data.header.title.image._boo);
 
 	return (
 		<div>

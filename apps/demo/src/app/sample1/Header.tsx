@@ -8,7 +8,6 @@ const titleSlice = createSlice(contentPeekaboo, data => data.header.title);
 
 const Header = () => {
 	const header = usePeekaboo(titleSlice()._boo);
-
 	return (
 		<div>
 			<h1>{header?.label ?? ''}</h1>
