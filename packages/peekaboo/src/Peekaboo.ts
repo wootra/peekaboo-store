@@ -27,12 +27,15 @@ const createStore = <T>(clonedData: T): Store => {
 };
 const createBooUid = (store: Store, booId: string) => `${store.storeId}-${booId}`;
 
-const getChildSet = <U>(obj: Record<keyof U, BooType<U[keyof U]>>, set: Set<string> = new Set<string>()) => {
+const getChildSet = <U>(
+	obj: Record<keyof U, { direct: BooType<U[keyof U]> }>,
+	set: Set<string> = new Set<string>()
+) => {
 	Object.keys(obj).forEach(key => {
 		const boo = obj[key as keyof typeof obj];
-		set.add(boo.__booUId);
-		if ('__childrenBoo' in boo) {
-			getChildSet(boo.__childrenBoo as Record<keyof U, BooType<U[keyof U]>>, set);
+		set.add(boo.direct.__booUId);
+		if ('__childrenBoo' in boo.direct) {
+			getChildSet(boo.direct.__childrenBoo as Record<keyof U, { direct: BooType<U[keyof U]> }>, set);
 		}
 	});
 	return set;
@@ -43,7 +46,7 @@ const createValueObj = <T>(
 	value: PeekaType<T>,
 	parentKey: string,
 	booKey: string,
-	__childrenBoo: Record<keyof T, BooType<T[keyof T]>> | null = null
+	__childrenBoo: Record<keyof T, { direct: BooType<T[keyof T]> }> | null = null
 ) => {
 	const __booId = parentKey ? `${parentKey}.${booKey}` : booKey;
 	const __booUId = createBooUid(__store, __booId);
@@ -118,7 +121,7 @@ const createValueObj = <T>(
 			Object.keys(__childrenBoo).forEach(key => {
 				if (newVal && typeof newVal === 'object' && typeof key === 'string') {
 					// @ts-ignore
-					__childrenBoo[key as keyof T].__initialize(newVal[key]);
+					__childrenBoo[key as keyof T].direct.__initialize(newVal[key]);
 				}
 			});
 		} else {
@@ -218,16 +221,16 @@ const convert = <U extends { [Key in keyof U]: U[Key] }>(store: Store, obj: U, p
 					'peekabooType' in obj[key as keyof U] &&
 					(obj[key as keyof U] as PeekaType<any>).peekabooType === 'peeka'
 				) {
-					acc[key as keyof U] = createValueObj(store, obj[key as keyof U], parentKey, key) as BooType<
-						U[keyof U]
-					>; // no childrenSet
+					acc[key as keyof U] = {
+						direct: createValueObj(store, obj[key as keyof U], parentKey, key) as BooType<U[keyof U]>,
+					}; // no childrenSet
 				} else {
 					const parent = convert(store, obj[key as keyof U], currKey);
 
 					acc[key as keyof U] = {
-						...(createValueObj(store, peeka(obj[key as keyof U]), parentKey, key, parent) as BooType<
+						direct: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key, parent) as BooType<
 							U[keyof U]
-						>),
+						>,
 						...parent,
 					};
 					Object.keys(parent).forEach(key => {
@@ -238,15 +241,15 @@ const convert = <U extends { [Key in keyof U]: U[Key] }>(store: Store, obj: U, p
 					});
 				}
 			} else {
-				acc[key as keyof U] = createValueObj(store, peeka(obj[key as keyof U]), parentKey, key);
+				acc[key as keyof U] = { direct: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key) };
 			}
 
 			return acc;
 		},
 		{} as Record<
 			keyof U,
-			| BooType<U[keyof U]>
-			| (BooType<U[keyof U]> & Record<keyof U[keyof U], BooType<U[keyof U][keyof U[keyof U]]>>)
+			| { direct: BooType<U[keyof U]> }
+			| ({ direct: BooType<U[keyof U]> } & Record<keyof U[keyof U], BooType<U[keyof U][keyof U[keyof U]]>>)
 		>
 	);
 };

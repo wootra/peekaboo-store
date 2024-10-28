@@ -7,7 +7,7 @@ import Trigger from 'components/Trigger';
 import { BooDataType } from 'peekaboo-store';
 import { createSlice } from 'peekaboo-store/utils/slices';
 const page1HeaderSlice = createSlice(peekaboo, data => data.routes.page1.header);
-const titles: BooDataType<ReturnType<typeof page1HeaderSlice>>[] = [
+const titles: BooDataType<ReturnType<typeof page1HeaderSlice>['direct']>[] = [
 	{
 		subTitle: 'subTitle1',
 		title: 'title1',
@@ -24,12 +24,12 @@ const titles: BooDataType<ReturnType<typeof page1HeaderSlice>>[] = [
 export default function Page() {
 	return (
 		<div>
-			<Trigger boo={page1HeaderSlice()} options={titles} />
+			<Trigger boo={page1HeaderSlice().direct} options={titles} />
 
 			{/* <div>{dropDownIndex}</div> */}
 			<h1>Web</h1>
-			<Updated boo={page1HeaderSlice().title} />
-			<Updated boo={page1HeaderSlice().subTitle} />
+			<Updated boo={page1HeaderSlice().title.direct} />
+			<Updated boo={page1HeaderSlice().subTitle.direct} />
 		</div>
 	);
 }

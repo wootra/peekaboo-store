@@ -7,7 +7,7 @@ import { createSlice } from 'peekaboo-store/utils/slices';
 const titleSlice = createSlice(contentPeekaboo, data => data.header.title);
 
 const Header = () => {
-	const header = usePeekaboo(titleSlice());
+	const header = usePeekaboo(titleSlice().direct);
 
 	return (
 		<div>
