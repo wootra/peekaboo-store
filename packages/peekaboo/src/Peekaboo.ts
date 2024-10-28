@@ -27,18 +27,30 @@ const createStore = <T>(clonedData: T): Store => {
 };
 const createBooUid = (store: Store, booId: string) => `${store.storeId}-${booId}`;
 
-const getChildSet = <U>(
-	obj: Record<keyof U, { direct: BooType<U[keyof U]> }>,
-	set: Set<string> = new Set<string>()
-) => {
+const getChildSet = <U>(obj: Record<keyof U, { _boo: BooType<U[keyof U]> }>, set: Set<string> = new Set<string>()) => {
 	Object.keys(obj).forEach(key => {
 		const boo = obj[key as keyof typeof obj];
-		set.add(boo.direct.__booUId);
-		if ('__childrenBoo' in boo.direct) {
-			getChildSet(boo.direct.__childrenBoo as Record<keyof U, { direct: BooType<U[keyof U]> }>, set);
+		set.add(boo._boo.__booUId);
+		if ('__childrenBoo' in boo._boo) {
+			getChildSet(boo._boo.__childrenBoo as Record<keyof U, { _boo: BooType<U[keyof U]> }>, set);
 		}
 	});
 	return set;
+};
+
+const isTypeSame = (a: any, b: any) => {
+	if (typeof a !== typeof b) return false;
+	if (a === null || b === null) return a === b;
+	if (typeof a === 'object' && typeof b === 'object') {
+		const keysA = new Set(Object.keys(a as object));
+		const keysB = new Set(Object.keys(b as object));
+		if (keysA.size !== keysB.size) return false;
+		for (let keyInA of keysA) {
+			if (!keysB.has(keyInA)) return false;
+			if (!isTypeSame(a[keyInA], b[keyInA])) return false;
+		}
+	}
+	return true;
 };
 
 const createValueObj = <T>(
@@ -46,7 +58,7 @@ const createValueObj = <T>(
 	value: PeekaType<T>,
 	parentKey: string,
 	booKey: string,
-	__childrenBoo: Record<keyof T, { direct: BooType<T[keyof T]> }> | null = null
+	__childrenBoo: Record<keyof T, { _boo: BooType<T[keyof T]> }> | null = null
 ) => {
 	const __booId = parentKey ? `${parentKey}.${booKey}` : booKey;
 	const __booUId = createBooUid(__store, __booId);
@@ -62,7 +74,7 @@ const createValueObj = <T>(
 	idSet.add(__booUId);
 
 	const set = (newValue: T, eventBubling = true, ignoreUpdate = false) => {
-		if (typeof newValue !== typeof initValue && ignoreUpdate === false) {
+		if (!isTypeSame(newValue, initValue)) {
 			console.warn(
 				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newValue}. ignoring...`
 			);
@@ -103,31 +115,36 @@ const createValueObj = <T>(
 		}
 	};
 	const __initialize = (newVal?: T) => {
-		if (typeof newVal !== typeof initValue) {
-			console.warn(
-				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
-			);
-			return;
-		}
-		initValue = newVal !== undefined ? newVal : initValue;
-		__store.data[__booUId] = initValue;
-		if (typeof newVal !== typeof initValue) {
-			console.warn(
-				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
-			);
-			return;
-		}
 		if (__booType === 'branch' && __childrenBoo) {
-			Object.keys(__childrenBoo).forEach(key => {
-				if (newVal && typeof newVal === 'object' && typeof key === 'string') {
-					// @ts-ignore
-					__childrenBoo[key as keyof T].direct.__initialize(newVal[key]);
-				}
-			});
+			if (typeof newVal !== typeof initValue) {
+				console.warn(
+					`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
+				);
+				return;
+			} else {
+				initValue = newVal !== undefined ? newVal : initValue;
+				__store.data[__booUId] = initValue;
+				Object.keys(__childrenBoo).forEach(key => {
+					if (newVal && typeof newVal === 'object' && typeof key === 'string') {
+						// @ts-ignore
+						__childrenBoo[key as keyof T]._boo.__initialize(newVal[key]);
+					}
+				});
+			}
 		} else {
-			// when leaf node, update actual data in the reference.
-			if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
-				(__store.data[__parentUId] as any)[booKey] = newVal; // only leaf will update the value
+			if (typeof newVal !== typeof initValue) {
+				console.warn(
+					`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
+				);
+				if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+					(__store.data[__parentUId] as any)[booKey] = initValue; // only leaf will update the value
+				}
+			} else {
+				initValue = newVal !== undefined ? newVal : initValue;
+				// when leaf node, update actual data in the reference.
+				if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+					(__store.data[__parentUId] as any)[booKey] = newVal; // only leaf will update the value
+				}
 			}
 		}
 
@@ -222,13 +239,13 @@ const convert = <U extends { [Key in keyof U]: U[Key] }>(store: Store, obj: U, p
 					(obj[key as keyof U] as PeekaType<any>).peekabooType === 'peeka'
 				) {
 					acc[key as keyof U] = {
-						direct: createValueObj(store, obj[key as keyof U], parentKey, key) as BooType<U[keyof U]>,
+						_boo: createValueObj(store, obj[key as keyof U], parentKey, key) as BooType<U[keyof U]>,
 					}; // no childrenSet
 				} else {
 					const parent = convert(store, obj[key as keyof U], currKey);
 
 					acc[key as keyof U] = {
-						direct: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key, parent) as BooType<
+						_boo: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key, parent) as BooType<
 							U[keyof U]
 						>,
 						...parent,
@@ -241,15 +258,15 @@ const convert = <U extends { [Key in keyof U]: U[Key] }>(store: Store, obj: U, p
 					});
 				}
 			} else {
-				acc[key as keyof U] = { direct: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key) };
+				acc[key as keyof U] = { _boo: createValueObj(store, peeka(obj[key as keyof U]), parentKey, key) };
 			}
 
 			return acc;
 		},
 		{} as Record<
 			keyof U,
-			| { direct: BooType<U[keyof U]> }
-			| ({ direct: BooType<U[keyof U]> } & Record<keyof U[keyof U], BooType<U[keyof U][keyof U[keyof U]]>>)
+			| { _boo: BooType<U[keyof U]> }
+			| ({ _boo: BooType<U[keyof U]> } & Record<keyof U[keyof U], BooType<U[keyof U][keyof U[keyof U]]>>)
 		>
 	);
 };

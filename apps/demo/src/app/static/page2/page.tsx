@@ -23,8 +23,8 @@ export default function Page() {
 		return new Array(1000).fill(null).map((_, idx) => {
 			return (
 				<div key={`id_${idx}`}>
-					<Updated boo={page2Slice()?.header.title.direct} />
-					<Updated boo={page2Slice()?.header.subTitle.direct} />
+					<Updated boo={page2Slice()?.header.title._boo} />
+					<Updated boo={page2Slice()?.header.subTitle._boo} />
 				</div>
 			);
 		});
@@ -41,8 +41,8 @@ export default function Page() {
 					gap: '20px',
 				}}
 			>
-				<Trigger boo={page2Slice()?.header.title.direct} options={['title1', 'title2']} />
-				<Trigger boo={page2Slice()?.header.subTitle.direct} options={['subtitle1', 'subtitle2']} />
+				<Trigger boo={page2Slice()?.header.title._boo} options={['title1', 'title2']} />
+				<Trigger boo={page2Slice()?.header.subTitle._boo} options={['subtitle1', 'subtitle2']} />
 			</div>
 
 			{/* <div>{dropDownIndex}</div> */}

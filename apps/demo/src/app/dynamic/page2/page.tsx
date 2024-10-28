@@ -21,16 +21,16 @@ export default function Page() {
 		return new Array(10).fill(null).map((_, idx) => {
 			return (
 				<div key={`id_${idx}`}>
-					<Updated boo={page2HeaderSlice().subTitle.direct} />
-					<Updated boo={page2HeaderSlice().title.direct} />
+					<Updated boo={page2HeaderSlice().subTitle._boo} />
+					<Updated boo={page2HeaderSlice().title._boo} />
 				</div>
 			);
 		});
 	}, []);
 	return (
 		<div>
-			<Trigger boo={page2HeaderSlice().title.direct} options={titles} />
-			<Trigger boo={page2HeaderSlice().subTitle.direct} options={subTitles} />
+			<Trigger boo={page2HeaderSlice().title._boo} options={titles} />
+			<Trigger boo={page2HeaderSlice().subTitle._boo} options={subTitles} />
 
 			{/* <div>{dropDownIndex}</div> */}
 			<h1>Web</h1>

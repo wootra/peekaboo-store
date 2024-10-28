@@ -39,7 +39,7 @@ type BranchBooType<T> =
 		? Readonly<
 				BooTypeBase<T> & {
 					__booType: 'branch';
-					__childrenBoo: Map<keyof T, { direct: BooType<T[keyof T]> }>;
+					__childrenBoo: Map<keyof T, { _boo: BooType<T[keyof T]> }>;
 				}
 			>
 		: never;
@@ -63,10 +63,10 @@ type BooDataType<T> = T extends BooType<infer X> ? X : never;
 
 type PeekabooParsed<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T>
-		? { direct: BooType<T> }
+		? { _boo: BooType<T> }
 		: K[Key] extends string | number | boolean | null | undefined
-			? { direct: BooType<K[Key]> }
-			: PeekabooParsed<K[Key]> & { direct: BooType<K[Key]> };
+			? { _boo: BooType<K[Key]> }
+			: PeekabooParsed<K[Key]> & { _boo: BooType<K[Key]> };
 };
 
 type CreateSliceType<
