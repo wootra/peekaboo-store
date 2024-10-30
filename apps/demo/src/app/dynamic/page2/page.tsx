@@ -15,7 +15,9 @@ const subTitles = ['subTitle1', 'subTitle2'];
 export default function Page() {
 	useEffect(() => {
 		// @ts-ignore
-		window.logUsed = () => getUsageLog(peekaboo);
+		window.getUsageLog = function (nodeType = 'all', includes = 'all') {
+			return getUsageLog(peekaboo, nodeType, includes);
+		};
 	}, []);
 	const arrays = useMemo(() => {
 		return new Array(10).fill(null).map((_, idx) => {

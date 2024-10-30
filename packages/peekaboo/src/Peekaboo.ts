@@ -9,7 +9,6 @@ import {
 	BooTypeBase,
 	LeafBooType,
 	BranchBooType,
-	BooKeyTypes,
 } from './types';
 
 let storeIdBase = Math.round(Math.random() * (1000 - 1)) + 1000;
@@ -42,9 +41,9 @@ const isTypeSame = (a: any, b: any) => {
 	if (typeof a !== typeof b) return false;
 	if (a === null || b === null) return a === b;
 	if (typeof a === 'object' && typeof b === 'object') {
-		const keysA = new Set(Object.keys(a as object));
+		const keysA = Object.keys(a as object);
 		const keysB = new Set(Object.keys(b as object));
-		if (keysA.size !== keysB.size) return false;
+		if (keysA.length !== keysB.size) return false;
 		for (let keyInA of keysA) {
 			if (!keysB.has(keyInA)) return false;
 			if (!isTypeSame(a[keyInA], b[keyInA])) return false;

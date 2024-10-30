@@ -124,8 +124,8 @@ Still annoying? Do you have to re-use it? No problem! use Slice.
 const titleSlice = createSlice(contentPeekaboo, data => data.header.title);
 
 const Header = () => {
-	const titleLabel = usePeekaboo(titleSlice().label);
-	const titleImage = usePeekaboo(titleSlice().image);
+	const titleLabel = usePeekaboo(titleSlice().label._boo);
+	const titleImage = usePeekaboo(titleSlice().image._boo);
     ...
 ```
 
@@ -186,7 +186,7 @@ import { contentPeekaboo } from 'app/sample1/_data/constant';
 import { usePeekaboo } from 'peekaboo-store/react';
 
 const Header = () => {
-	const header = usePeekaboo(contentPeekaboo.data.header.title); // title Boo returns an object
+	const header = usePeekaboo(contentPeekaboo.data.header.title._boo); // title Boo returns an object
 
 	return (
 		<div>
@@ -272,4 +272,4 @@ You can intialize Boo with `BooType.__initialize` function. With the argument, y
 
 [Demo for .used() - getUsageLog](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/page2/page.tsx)
 
-You 
+You can see usage report. 
