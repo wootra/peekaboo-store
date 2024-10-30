@@ -17,3 +17,4 @@ add size-limit
 add everUsed function
 make all mid level structure Boo
 adjust object for better typescript usage.
+update usage function

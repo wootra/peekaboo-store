@@ -272,4 +272,11 @@ You can intialize Boo with `BooType.__initialize` function. With the argument, y
 
 [Demo for .used() - getUsageLog](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/page2/page.tsx)
 
-You can see usage report. 
+You can see usage report. This is useful if you want to track the orphan nodes.
+
+In the above example code, it registers getUsageLog to the window object, so I can use the function in the browser console. It can be used to pass the value to the API.
+```typescript
+getUsageLog('leaf', 'unused');
+```
+
+![alt text](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/getUsageLog.png?raw=true)
