@@ -102,6 +102,11 @@
 			"path": "./dist/utils/usage.mjs",
 			"import": "*",
 			"limit": "500 ms"
+		},
+		{
+			"path": "./dist/utils/content.mjs",
+			"import": "*",
+			"limit": "500 ms"
 		}
 	],
 	"keywords": [

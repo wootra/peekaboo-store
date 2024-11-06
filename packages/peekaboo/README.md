@@ -20,7 +20,7 @@ With peekaboo-store, we will have full-typescript support for the data structure
 
 ## Power of peekaboo-store
 
-- lightweight! (core is 544B)
+- lightweight! (core is 1.41kB, react hook is 451B)
 - event driven content update
 - content organize(manage your CMS system). hook managed labels will help you to update your SPA without full-reload.
 - dynamic full content update support
