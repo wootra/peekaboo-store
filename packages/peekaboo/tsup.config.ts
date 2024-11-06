@@ -6,6 +6,7 @@ export default defineConfig({
 		'utils/slices': 'src/utils/slices.ts',
 		'utils/update': 'src/utils/update.ts',
 		'utils/usage': 'src/utils/usage.ts',
+		'utils/content': 'src/utils/content.ts',
 		'vanilla/index': 'src/vanilla/index.ts',
 		'react/index': 'src/react/index.ts',
 	},

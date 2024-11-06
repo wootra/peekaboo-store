@@ -276,7 +276,22 @@ You can see usage report. This is useful if you want to track the orphan nodes.
 
 In the above example code, it registers getUsageLog to the window object, so I can use the function in the browser console. It can be used to pass the value to the API.
 ```typescript
-getUsageLog('leaf', 'unused');
+import { getUsageLog } from 'peekaboo-store/utils/usage';
+
+const peekaboo = createPeekaboo({...});
+getUsageLog(peekaboo, 'leaf', 'unused');
 ```
 
 ![alt text](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/getUsageLog.png?raw=true)
+
+## Get current content
+
+You can see all current contents of a peekaboo store. 
+
+[Demo - getContent](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/page2/page.tsx)
+
+```typescript
+import { getContent } from 'peekaboo-store/utils/content';
+const peekaboo = createPeekaboo({...});
+getContent(peekaboo, 'leaf', 'unused');
+```

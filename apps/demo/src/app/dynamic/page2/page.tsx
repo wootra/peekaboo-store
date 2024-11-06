@@ -6,7 +6,8 @@ import Updated from 'components/Updated';
 import Trigger from 'components/Trigger';
 import { peekaboo } from 'app/dynamic/_data/const';
 import { createSlice } from 'peekaboo-store/utils/slices';
-import { getUsageLog } from 'peekaboo-store/utils/usage';
+import { BooNodeType, getUsageLog, IncludeType } from 'peekaboo-store/utils/usage';
+import { getContent } from 'peekaboo-store/utils/content';
 
 const page2HeaderSlice = createSlice(peekaboo, data => data.routes.page2.header);
 const titles = ['title1', 'title2'];
@@ -15,9 +16,11 @@ const subTitles = ['subTitle1', 'subTitle2'];
 export default function Page() {
 	useEffect(() => {
 		// @ts-ignore
-		window.getUsageLog = function (nodeType = 'all', includes = 'all') {
+		window.getUsageLog = function (nodeType: BooNodeType = 'all', includes: IncludeType = 'all') {
 			return getUsageLog(peekaboo, nodeType, includes);
 		};
+		// @ts-ignore
+		window.getContent = () => getContent(peekaboo);
 	}, []);
 	const arrays = useMemo(() => {
 		return new Array(10).fill(null).map((_, idx) => {

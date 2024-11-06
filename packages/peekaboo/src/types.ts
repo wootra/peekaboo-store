@@ -86,6 +86,8 @@ type OrgTypes<K> = {
 
 type PeekabooObjSourceData<U> = U extends PeekabooObj<infer T> ? OrgTypes<T> : U;
 
+type BooNodeType = 'leaf' | 'all' | 'branch';
+
 export type {
 	Store,
 	BooType,
@@ -102,4 +104,5 @@ export type {
 	PeekabooObjSourceData,
 	UpdateDetail,
 	BooKeyTypes,
+	BooNodeType,
 };

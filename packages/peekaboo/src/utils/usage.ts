@@ -1,12 +1,9 @@
-import { BooType, PeekabooObj } from '../types';
+import { BooNodeType, BooType, PeekabooObj } from '../types';
 
 type UsageData = { __used: boolean; __allUsed: boolean; __everUsed: boolean; __allEverUsed: boolean };
 
-function getUsageLog<U>(
-	peekaboo: PeekabooObj<U>,
-	nodeType: 'leaf' | 'all' | 'branch' = 'all',
-	includes: 'all' | 'used' | 'everUsed' | 'unused' | 'neverUsed' = 'unused'
-) {
+type IncludeType = 'all' | 'used' | 'everUsed' | 'unused' | 'neverUsed';
+function getUsageLog<U>(peekaboo: PeekabooObj<U>, nodeType: BooNodeType = 'all', includes: IncludeType = 'unused') {
 	return Object.keys(peekaboo.store.booMap).reduce(
 		(acc, key) => {
 			const boo = peekaboo.store.booMap[key] as BooType<UsageData>;
@@ -37,4 +34,5 @@ function getUsageLog<U>(
 	);
 }
 
+export type { BooNodeType, IncludeType };
 export { getUsageLog };

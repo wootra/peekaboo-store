@@ -15,6 +15,7 @@
 		"./vanilla": "./src/vanilla/index.ts",
 		"./utils/slices": "./src/utils/slices.ts",
 		"./utils/update": "./src/utils/update.ts",
+		"./utils/content": "./src/utils/content.ts",
 		"./utils/usage": "./src/utils/usage.ts"
 	},
 	"exports": {
@@ -23,6 +24,7 @@
 		"./vanilla": "./dist/vanilla/index.mjs",
 		"./utils/slices": "./dist/utils/slices.mjs",
 		"./utils/update": "./dist/utils/update.mjs",
+		"./utils/content": "./dist/utils/content.mjs",
 		"./utils/usage": "./dist/utils/usage.mjs"
 	},
 	"scripts": {

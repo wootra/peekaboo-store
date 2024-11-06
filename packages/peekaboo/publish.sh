@@ -14,4 +14,4 @@ echo $VERSION
 npm version $VERSION
 
 sh ./tag-current-version.sh
-npm publish --access public
+# npm publish --access public
