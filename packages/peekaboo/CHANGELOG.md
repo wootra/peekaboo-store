@@ -1,5 +1,10 @@
 # Change Logs
 
+## 1.4.1
+
+add jest
+add getContentAsObject
+
 ## 1.4.0
 
 add getContent
