@@ -35,7 +35,7 @@ import Layout from '../layouts/Layout.astro';
 </style>
 <script >
 	import {usePeekaboo} from 'peekaboo-store/vanilla';
-	import {createPeekaboo, peeka} from 'peekaboo-store';
+	import {createPeekaboo} from 'peekaboo-store';
 	const randomValue = Math.round(Math.random()*10000);
 	const store = createPeekaboo({
 		header1: randomValue,
@@ -48,7 +48,7 @@ import Layout from '../layouts/Layout.astro';
 	for(let i=0; i<header1Btns.length; i++){
 		header1Btns.item(i).addEventListener('click', (e)=>{
 			const val = (e.target as HTMLDivElement).dataset["val"] ?? "-1";
-			store.data.header1.set(parseInt(val));
+			store.data.header1._boo.set(parseInt(val));
 		});
 	};
 
@@ -56,23 +56,23 @@ import Layout from '../layouts/Layout.astro';
 	for(let i=0; i<header2Btns.length; i++){
 		header2Btns.item(i).addEventListener('click', (e)=>{
 			const val = (e.target as HTMLDivElement).dataset["val"] ?? "not-set";
-			store.data.header2.content.set(val);
+			store.data.header2.content._boo.set(val);
 		});
 	};
 
 
 	document.getElementById('btn2')?.addEventListener('click', ()=>{
-		store.data.header1.set(2);
+		store.data.header1._boo.set(2);
 	});
 	
-	usePeekaboo(store.data.header1, (v)=>{
+	usePeekaboo(store.data.header1._boo, (v)=>{
 		const el = document.querySelector('#header1 .content');
 		if(el){
 			el.innerHTML = `${v}`;
 		}
 	});
 
-	usePeekaboo(store.data.header2.content, (v)=>{
+	usePeekaboo(store.data.header2.content._boo, (v)=>{
 		const el = document.querySelector('#header2 .content');
 		if(el){
 			el.innerHTML = `${v}`;
@@ -82,11 +82,11 @@ import Layout from '../layouts/Layout.astro';
 	let el;
 	el = document.querySelector('#header1 .content');
 	if(el){
-		el.innerHTML = `${store.data.header1.init()}`;
+		el.innerHTML = `${store.data.header1._boo.init()}`;
 	}
 
 	el = document.querySelector('#header2 .content');
 	if(el){
-		el.innerHTML = `${store.data.header2.content.init()}`;
+		el.innerHTML = `${store.data.header2.content._boo.init()}`;
 	}
 </script>

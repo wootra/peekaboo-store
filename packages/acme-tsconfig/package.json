@@ -1,9 +1,13 @@
 {
-  "name": "@acme/tsconfig",
-  "version": "0.0.0",
-  "private": true,
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  }
+	"name": "@acme/tsconfig",
+	"version": "0.0.0",
+	"private": true,
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "echo 'build no need'",
+		"test": "echo 'test no need'"
+	}
 }
