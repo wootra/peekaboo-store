@@ -17,6 +17,6 @@ export default defineConfig({
 	external: ['react'],
 	dts: true,
 	clean: true,
-	minify: true,
-	bundle: true,
+	// minify: true,
+	// bundle: true,
 });
