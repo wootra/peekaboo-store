@@ -136,14 +136,23 @@ const createValueObj = <T>(
 				console.warn(
 					`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
 				);
-				if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
-					(__store.data[__parentUId] as any)[booKey] = initValue; // only leaf will update the value
+				if (parentKey) {
+					if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+						(__store.data[__parentUId] as any)[booKey] = initValue; // only leaf will update the value
+					}
+				} else {
+					__store.data[__booUId] = initValue;
 				}
 			} else {
 				initValue = newVal !== undefined ? newVal : initValue;
 				// when leaf node, update actual data in the reference.
-				if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
-					(__store.data[__parentUId] as any)[booKey] = newVal; // only leaf will update the value
+				// only leaf will update the value
+				if (parentKey) {
+					if (__store.data[__parentUId] && typeof __store.data[__parentUId] === 'object') {
+						(__store.data[__parentUId] as any)[booKey] = newVal;
+					}
+				} else {
+					__store.data[__booUId] = newVal;
 				}
 			}
 		}

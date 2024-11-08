@@ -84,7 +84,12 @@ type OrgTypes<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? T : OrgTypes<K[Key]>;
 };
 
+type PartialOrgTypes<K> = {
+	[Key in keyof K]?: K[Key] extends PeekaType<infer T> ? T : PartialOrgTypes<K[Key]>;
+};
+
 type PeekabooObjSourceData<U> = U extends PeekabooObj<infer T> ? OrgTypes<T> : U;
+type PeekabooObjPartialSourceData<U> = U extends PeekabooObj<infer T> ? PartialOrgTypes<T> : U;
 
 type BooNodeType = 'leaf' | 'all' | 'branch';
 
@@ -102,6 +107,7 @@ export type {
 	CreateSliceType,
 	BooDataType,
 	PeekabooObjSourceData,
+	PeekabooObjPartialSourceData,
 	UpdateDetail,
 	BooKeyTypes,
 	BooNodeType,

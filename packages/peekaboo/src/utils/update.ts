@@ -1,9 +1,9 @@
 import { INIT_VALUE } from '../consts';
-import { BooType, PeekabooObj, PeekabooObjSourceData, Store, UpdateDetail } from '../types';
+import { BooType, PeekabooObj, PeekabooObjPartialSourceData, Store, UpdateDetail } from '../types';
 
 const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyof U>(
 	store: Store,
-	updateObj: Partial<PeekabooObjSourceData<PeekabooObj<U>>>,
+	updateObj: Partial<PeekabooObjPartialSourceData<PeekabooObj<U>>>,
 	parentKey: string
 ) => {
 	Object.keys(updateObj).forEach(key => {
@@ -18,7 +18,10 @@ const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyo
 		} else {
 			// data is primitivetype
 			if (store.booMap[keyToFind]) {
-				(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
+				if (updateObj[key as K] !== undefined) {
+					// sometimes value to update is undefined. in this case, this should be ignored.
+					(store.booMap[keyToFind] as BooType<unknown>).__initialize(updateObj[key as K]);
+				}
 			} else {
 				// but there are no existing boo.
 				console.warn('path [' + currKey + '] does not exist. You need to set init structure for this first.');
@@ -29,7 +32,7 @@ const update = <U extends { [Key in keyof U]: U[Key] }, K extends keyof U = keyo
 
 function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	peekaboo: PeekabooObj<U>,
-	initData: Partial<PeekabooObjSourceData<PeekabooObj<U>>>
+	initData: PeekabooObjPartialSourceData<PeekabooObj<U>>
 ): void {
 	if (!initData || typeof initData !== 'object') {
 		throw new Error('Peekaboo initData must be an object');
