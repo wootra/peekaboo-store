@@ -1,5 +1,10 @@
 # Change Logs
 
+## 1.4.2
+should ignore undefined value
+fix no parent node did not update its value 
+setup unit tests to use vitest
+
 ## 1.4.1
 
 add jest
