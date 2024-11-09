@@ -1,4 +1,8 @@
 # Change Logs
+
+## 1.5.1
+update README
+
 ## 1.5.0
 add schema util
 
