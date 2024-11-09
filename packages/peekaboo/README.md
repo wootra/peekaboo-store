@@ -293,5 +293,38 @@ You can see all current contents of a peekaboo store.
 ```typescript
 import { getContent } from 'peekaboo-store/utils/content';
 const peekaboo = createPeekaboo({...});
-getContent(peekaboo, 'leaf', 'unused');
+const content = getContent(peekaboo);
+// result will be flat object with '.' notation
+// ex> { "key1.key2.key3": 'value', "key1.key2.key4": false }
+```
+
+or take the result as object form without `dot` connected format
+
+
+```typescript
+import { getContentAsObject } from 'peekaboo-store/utils/content';
+const peekaboo = createPeekaboo({...});
+const content = getContentAsObject(peekaboo);
+// result will be multi-layer object
+// ex> { key1: {key2: {key3: 'value', key4: false }}}
+```
+
+## Get schema from the initial data
+
+You may want to create a validator for the data.
+Peekaboo-store has a built-in schema generator powered by [zod](https://www.npmjs.com/package/zod)
+the schema is automatically become `optional` structures for each items,
+so even though a partial data is given, it will handle the parser properly.
+
+```typescript
+import { getSchema } from 'peekaboo-store/utils/schema';
+const initValue = {
+	key1: 'string-value',
+	key2: 100
+};
+const peekaboo = createPeekaboo(initValue);
+const schema = getSchema(peekaboo);
+const parsed = schema.parse({key1: 'other-value'}); // okay!
+const parsed2 = schema.parse({key1: 999}); // will throw error!
+const parsed3 = schema.parse({key1: 'val', key3: 'test'}); // will return {key1: 'val'} only since key3 is not registered value!
 ```
