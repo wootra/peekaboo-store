@@ -1,4 +1,4 @@
-import { BooType, PeekabooObj } from '../types';
+import { BooType, OrgTypes, PeekabooObj } from '../types';
 
 function getContent<U>(peekaboo: PeekabooObj<U>) {
 	return Object.keys(peekaboo.store.booMap).reduce(
@@ -37,8 +37,10 @@ function _convertContentToObj(contentObj: Record<string, any>) {
 		{} as Record<string, any>
 	);
 }
+
 function getContentAsObject<U>(peekaboo: PeekabooObj<U>) {
 	const contentObj = getContent(peekaboo);
-	return _convertContentToObj(contentObj);
+	return _convertContentToObj(contentObj) as OrgTypes<U>;
 }
+
 export { getContent, getContentAsObject, _setObjByKey, _convertContentToObj };

@@ -111,4 +111,6 @@ export type {
 	UpdateDetail,
 	BooKeyTypes,
 	BooNodeType,
+	OrgTypes,
+	PartialOrgTypes,
 };

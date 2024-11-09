@@ -125,5 +125,8 @@
 		"management",
 		"store",
 		"peekaboo"
-	]
+	],
+	"dependencies": {
+		"zod": "^3.23.8"
+	}
 }
