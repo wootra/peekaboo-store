@@ -1,4 +1,6 @@
 # Change Logs
+## 1.5.0
+add schema util
 
 ## 1.4.2
 should ignore undefined value
