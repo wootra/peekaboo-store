@@ -2,6 +2,7 @@
 
 ## 1.6.0
 architecture change to fix the update bugs.
+fill up unit tests
 
 ## 1.5.1
 update README
