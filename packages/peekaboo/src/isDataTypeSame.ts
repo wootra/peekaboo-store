@@ -5,11 +5,13 @@ const isDataTypeSame = (dst: any, cmp: any, logKeyLevel: string[] = []) => {
 	}
 	if (dst === null || cmp === null) return dst === cmp;
 	if (typeof dst === 'object' && typeof cmp === 'object') {
-		if (Array.isArray(dst)) {
+		if (Array.isArray(dst) && Array.isArray(cmp)) {
 			const dstArr = dst as unknown[];
 			const cmpArr = cmp as unknown[];
 			if (dstArr.length === 0 || cmpArr.length === 0) return true;
 			return isDataTypeSame(dstArr[0], cmpArr[0], [...logKeyLevel, '0']);
+		} else if (Array.isArray(dst) || Array.isArray(cmp)) {
+			return false; // one is array, the other is not
 		}
 		const keysB = Object.keys(cmp as object);
 		const keysA = new Set(Object.keys(dst as object));

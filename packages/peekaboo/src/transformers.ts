@@ -52,27 +52,17 @@ function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, d
  * if it is not PeekaType, return as it is.
  */
 const stripPeeka = (value: any) => {
-	if (value && typeof value === 'object') {
-		if ((value as PeekaType<unknown>).peekabooType === 'peeka') {
-			return value.init;
-		}
+	if (isPeekaType(value)) return (value as PeekaType<unknown>).init;
+	if (typeof value === 'object' && !Array.isArray(value)) {
+		return Object.keys(value).reduce(
+			(acc, key) => {
+				acc[key] = stripPeeka(value[key]);
+				return acc;
+			},
+			{} as Record<string, any>
+		);
 	}
 	return value;
-};
-
-const cleanChildren = (value: any) => {
-	if (value && typeof value === 'object') {
-		if ((value as PeekaType<unknown>).peekabooType === 'peeka') {
-			return value.init;
-		} else {
-			Object.keys(value).forEach(key => {
-				value[key] = cleanChildren(value[key]);
-			});
-			return value; // keep the reference
-		}
-	} else {
-		return value;
-	}
 };
 
 const syncAndCollectChanged = (
@@ -85,9 +75,6 @@ const syncAndCollectChanged = (
 ): boolean => {
 	if (updatedObj[keyToUpdate] === undefined) return false;
 
-	if (typeof initData !== 'object' || typeof updatedObj !== 'object' || typeof objToSync !== 'object') {
-		throw new Error('wrong usage. should be used only for object type since its reference should be updated.');
-	}
 	const call = () => {
 		onChanged([...parentKeysStacks, keyToUpdate], updatedObj[keyToUpdate]);
 	};
@@ -152,10 +139,6 @@ const updateValuesInObjByKey = (
 ) => {
 	if (updatedObj[keyToUpdate] === undefined) return false;
 
-	if (typeof initData !== 'object' || typeof updatedObj !== 'object' || typeof objToSync !== 'object') {
-		throw new Error('wrong usage. should be used only for object type since its reference should be updated.');
-	}
-
 	if (isPeekaType(initData[keyToUpdate]) || typeof initData[keyToUpdate] !== 'object') {
 		if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
 			updateDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
@@ -185,15 +168,12 @@ function _getObjByKey(obj: Record<string, any>, keysArr: string[]) {
 	if (keysArr.length === 0) return obj;
 	let currObj = obj;
 
-	for (let i = 0; i < keysArr.length - 1; i++) {
+	for (let i = 0; currObj && i < keysArr.length - 1; i++) {
 		const currKey = keysArr[i];
 
-		if (!currObj[currKey]) {
-			return undefined;
-		}
 		currObj = currObj[currKey];
 	}
-	return currObj[keysArr[keysArr.length - 1]];
+	return currObj?.[keysArr[keysArr.length - 1]];
 }
 
 /**
@@ -202,14 +182,16 @@ function _getObjByKey(obj: Record<string, any>, keysArr: string[]) {
  * do not assign index parameter manually. it is used for recursive call.
  */
 function _setObjByKey(obj: Record<string, any>, value: any, keysArr: string[]) {
-	if (keysArr.length === 0) return;
+	const errMsg = 'should check the code! empty key is found. keysArr is:';
+	if (keysArr.length === 0 || keysArr.filter(Boolean).length === 0) {
+		console.error(errMsg, keysArr);
+		return;
+	}
 	let currObj = obj;
 
 	for (let i = 0; i < keysArr.length - 1; i++) {
 		const currKey = keysArr[i];
-		if (!currKey) {
-			console.error('should check the code! empty key is found. keysArr is:', keysArr);
-		}
+
 		if (!currObj[currKey]) {
 			currObj[currKey] = {};
 		}
@@ -237,7 +219,6 @@ function _convertContentToObj(contentObj: Record<string, any>) {
 export {
 	cloneInitData,
 	sanitizeInitData,
-	cleanChildren,
 	_convertContentToObj,
 	_setObjByKey,
 	_getObjByKey,

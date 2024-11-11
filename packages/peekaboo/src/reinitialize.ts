@@ -9,7 +9,7 @@ const reinitialize = (
 	initData: Record<string, any>,
 	updatedObj: any,
 	keyToUpdate: string,
-	parentKeysStacks: string[] = []
+	parentKeysStacks: string[]
 ) => {
 	if (updatedObj === undefined) return;
 
@@ -18,27 +18,28 @@ const reinitialize = (
 	}
 
 	const booUid = createBooUidFromLayer(store, [...parentKeysStacks, keyToUpdate]);
-	store.booMap[booUid].__resetUsage();
-	if (!keyToUpdate) {
-		for (const key in initData) {
-			reinitialize(store, initData, updatedObj[key], key, [...parentKeysStacks]);
+	const boo = store.booMap[booUid];
+	if (!boo) {
+		console.error('boo is not found for ' + booUid, 'from', Object.keys(store.booMap));
+		throw new Error(`boo not found in ${booUid}`);
+	}
+	boo.__resetUsage();
+
+	if (isPeekaType(initData[keyToUpdate])) {
+		const peekaData = initData[keyToUpdate] as PeekaType<any>;
+		const isSame = isDataTypeSame(peekaData.init, updatedObj, [...parentKeysStacks, keyToUpdate]);
+		if (isSame) {
+			peekaData.init = updatedObj;
 		}
+	} else if (typeof initData[keyToUpdate] !== 'object') {
+		updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
 	} else {
-		if (isPeekaType(initData[keyToUpdate])) {
-			const peekaData = initData[keyToUpdate] as PeekaType<any>;
-			const isSame = isDataTypeSame(peekaData.init, updatedObj, [...parentKeysStacks, keyToUpdate]);
-			if (isSame) {
-				peekaData.init = updatedObj;
-			}
-		} else if (typeof initData[keyToUpdate] !== 'object') {
+		if (Array.isArray(initData[keyToUpdate])) {
 			updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
-		} else {
-			if (Array.isArray(initData[keyToUpdate])) {
-				updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
-			}
-			for (const key in initData[keyToUpdate]) {
-				reinitialize(store, initData[keyToUpdate], updatedObj[key], key, [...parentKeysStacks, keyToUpdate]);
-			}
+			return;
+		}
+		for (const key in initData[keyToUpdate]) {
+			reinitialize(store, initData[keyToUpdate], updatedObj[key], key, [...parentKeysStacks, keyToUpdate]);
 		}
 	}
 };

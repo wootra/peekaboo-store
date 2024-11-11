@@ -35,5 +35,15 @@ describe('update', () => {
 			expect(testStore.data.test3.test31._boo.get()).toBe(converted.test3.test31);
 			expect(testStore.data.test3.test32._boo.get()).toBe(defaultVal.test3.test32);
 		});
+
+		it('should throw exception when not object added', () => {
+			const errMsg = 'Peekaboo initData must be an object';
+			// @ts-ignore
+			expect(() => updatePeekaboo(testStore, 1)).toThrow(errMsg);
+			// @ts-ignore
+			expect(() => updatePeekaboo(testStore, 'test')).toThrow(errMsg);
+			// @ts-ignore
+			expect(() => updatePeekaboo(testStore, true)).toThrow(errMsg);
+		});
 	});
 });

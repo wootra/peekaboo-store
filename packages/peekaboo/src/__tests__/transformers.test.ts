@@ -36,6 +36,20 @@ describe('transformers', () => {
 			_setObjByKey(obj, value, keysArr);
 			expect(obj).toEqual({ key1: { key2: 'value' } });
 		});
+
+		it('should NOT set value to object by key when key is empty', () => {
+			const obj = { key1: { key2: 'org-value' } };
+			const value = 'value';
+			_setObjByKey(obj, value, []);
+			expect(obj).toEqual({ key1: { key2: 'org-value' } });
+		});
+
+		it('should NOT set value to object by key when empty key is added', () => {
+			const obj = { key1: { key2: 'org-value' } };
+			const value = 'value';
+			_setObjByKey(obj, value, ['']);
+			expect(obj).toEqual({ key1: { key2: 'org-value' } });
+		});
 	});
 
 	describe('_getObjByKey', () => {
@@ -62,6 +76,13 @@ describe('transformers', () => {
 		it('should get undefined when key does not exist', () => {
 			const obj = { key1: { key3: 'value' } };
 			const keysArr = ['key1', 'key2'];
+
+			expect(_getObjByKey(obj, keysArr)).toBeUndefined();
+		});
+
+		it('should get undefined when key does not exist', () => {
+			const obj = { key1: { key3: 'value' } };
+			const keysArr = ['key0', 'key2'];
 
 			expect(_getObjByKey(obj, keysArr)).toBeUndefined();
 		});

@@ -27,22 +27,26 @@ const isPeekaLayer = (obj: any, keys: string[], index?: number) => {
 	if (keys.length === 0) return isPeekaType(obj);
 	const indexToSearch = index ?? keys.length - 1;
 	let objToSearch = obj;
-	for (let i = 0; i < indexToSearch; i++) {
-		if (!objToSearch[keys[i]]) {
+	const throwErrorIfNotValid = (obj: any, key: string) => {
+		if (!obj[key]) {
 			const errorCode = Math.random().toString(36).substring(7);
 			console.error(
-				`${errorCode}: key ${keys[i]} is not valid for object. must be a bug`,
+				`${errorCode}: key ${key} is not valid for object. must be a bug`,
 				'keys:',
 				keys,
 				'index',
 				index,
 				'object to search',
-				objToSearch
+				obj
 			);
 			throw new Error(`key is not found. check above error message. code is: ${errorCode}`);
 		}
+	};
+	for (let i = 0; i < indexToSearch; i++) {
+		throwErrorIfNotValid(objToSearch, keys[i]);
 		objToSearch = objToSearch[keys[i]];
 	}
+	throwErrorIfNotValid(objToSearch, keys[indexToSearch]);
 	return isPeekaType(objToSearch[keys[indexToSearch]]);
 };
 export { peeka, isPeekaType, isPeekaLayer };

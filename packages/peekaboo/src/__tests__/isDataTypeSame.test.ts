@@ -94,4 +94,39 @@ describe('isDataTypeSame', () => {
 		};
 		expect(isDataTypeSame(src, cmp)).toBe(true);
 	});
+
+	it('should return true when array type matches', () => {
+		expect(isDataTypeSame([1, 2, 3], [1, 2])).toBe(true);
+		expect(isDataTypeSame([{}], [{}])).toBe(true);
+		expect(isDataTypeSame([{ a: 1 }], [{ a: 3 }])).toBe(true);
+		expect(isDataTypeSame([{ a: 1 }], [{ a: 3, b: 2 }])).toBe(true);
+		expect(isDataTypeSame([{ a: 1, c: 3 }], [{ a: 3 }])).toBe(true); // even though object item does not match, its type matches, it is considered as match
+	});
+
+	it('should return true when one of the array is empty', () => {
+		expect(isDataTypeSame([1, 2, 3], [])).toBe(true);
+		expect(isDataTypeSame([], [1, 2, 3])).toBe(true);
+	});
+
+	it('should return true when one of the array is empty', () => {
+		expect(isDataTypeSame([1, 2, 3], [])).toBe(true);
+		expect(isDataTypeSame([], [1, 2, 3])).toBe(true);
+	});
+
+	it('should return false when only one is array', () => {
+		expect(isDataTypeSame([1, 2, 3], 1)).toBe(false);
+		expect(isDataTypeSame(1, [1, 2, 3])).toBe(false);
+		expect(isDataTypeSame([1, 2, 3], { 0: 1, 1: 2, 2: 3 })).toBe(false);
+		expect(isDataTypeSame({ 0: 1, 1: 2, 2: 3 }, [1, 2, 3])).toBe(false);
+		expect(isDataTypeSame([1, 2, 3], 1)).toBe(false);
+	});
+
+	it("should return false when first array's item does not match", () => {
+		expect(isDataTypeSame([{}], [1])).toBe(false);
+		expect(isDataTypeSame([1], [{}])).toBe(false);
+		expect(isDataTypeSame([{ a: 1 }], [{ a: 'a' }])).toBe(false);
+		expect(isDataTypeSame([1, 2, 3], { 0: 1, 1: 2, 2: 3 })).toBe(false);
+		expect(isDataTypeSame({ 0: 1, 1: 2, 2: 3 }, [1, 2, 3])).toBe(false);
+		expect(isDataTypeSame([1, 2, 3], 1)).toBe(false);
+	});
 });
