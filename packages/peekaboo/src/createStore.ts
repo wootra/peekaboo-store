@@ -10,24 +10,23 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(init
 	const data = sanitizeInitData(initData);
 	const hookRegisteredCount: Record<string, number> = {};
 
-	const registerHook = (boo: BooType<any>) => {
-		const key = boo.__booUId;
-		if (hookRegisteredCount[key] === undefined) {
-			hookRegisteredCount[key] = 1;
+	const registerHook = (booUId: string) => {
+		if (hookRegisteredCount[booUId] === undefined) {
+			hookRegisteredCount[booUId] = 1;
 		} else {
-			hookRegisteredCount[key]++;
+			hookRegisteredCount[booUId]++;
 		}
 	};
-	const unregisterHook = (boo: BooType<any>) => {
-		const key = boo.__booUId;
-		if (hookRegisteredCount[key] === undefined) {
+	const unregisterHook = (booUId: string) => {
+		if (hookRegisteredCount[booUId] === undefined) {
 			console.warn(
 				'hookRegisteredCount is not found. could be because of hot-loading or you removed this hook multiple times.'
 			);
+			return;
 		}
-		hookRegisteredCount[key]--;
-		if (hookRegisteredCount[key] === 0) {
-			delete hookRegisteredCount[key];
+		hookRegisteredCount[booUId]--;
+		if (hookRegisteredCount[booUId] === 0) {
+			delete hookRegisteredCount[booUId];
 		}
 	};
 	return {
@@ -38,8 +37,8 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(init
 		}, // used only for comparison
 		data, // will be returned to the user
 		initData: { data: cloned },
-		hookRegisteredCount: (id: string) => {
-			return hookRegisteredCount[id] ?? 0;
+		hookRegisteredCount: booUId => {
+			return hookRegisteredCount[booUId] ?? 0;
 		},
 		registerHook,
 		unregisterHook,

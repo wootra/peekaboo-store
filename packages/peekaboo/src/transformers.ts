@@ -4,9 +4,14 @@ import { OrgTypes, PeekaType } from './types';
 
 function cloneInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest: any = {}): T {
 	for (const key in initData) {
+		if (isPeekaType(initData[key])) {
+			dest[key] = initData[key]; // do not clone more.
+			continue;
+		}
 		if (typeof initData[key] === 'object') {
-			if (isPeekaType(initData[key])) {
+			if (Array.isArray(initData[key])) {
 				dest[key] = initData[key]; // do not clone more.
+				continue;
 			} else {
 				if (!dest[key]) {
 					dest[key] = {} as T[keyof T];
@@ -22,9 +27,13 @@ function cloneInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest
 
 function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest: any = {}): OrgTypes<T> {
 	for (const key in initData) {
+		if (isPeekaType(initData[key])) {
+			dest[key] = (initData[key] as PeekaType<T[keyof T]>).init;
+			continue;
+		}
 		if (typeof initData[key] === 'object') {
-			if (isPeekaType(initData[key])) {
-				dest[key] = (initData[key] as PeekaType<T[keyof T]>).init;
+			if (Array.isArray(initData[key])) {
+				dest[key] = initData[key]; // array should be as it is.
 			} else {
 				if (!dest[key]) {
 					dest[key] = {} as T[keyof T];
@@ -153,9 +162,10 @@ const updateValuesInObjByKey = (
 		}
 	} else {
 		if (typeof initData[keyToUpdate] === 'object' && Array.isArray(initData[keyToUpdate])) {
-			if (initData[keyToUpdate] !== updatedObj[keyToUpdate]) {
+			if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
 				updateDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
 			}
+			return;
 		}
 		for (const key in initData[keyToUpdate]) {
 			updateValuesInObjByKey(initData[keyToUpdate], updatedObj[keyToUpdate], objToSync[keyToUpdate], key, [

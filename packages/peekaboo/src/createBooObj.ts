@@ -9,9 +9,10 @@ type BooInfo = {
 	parentKeys: string[];
 	parentBoo: BooType<any> | null;
 	booKey: string;
+	optimizeHook?: boolean;
 };
 const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
-	const { booType: __booType, parentKeys: __layerKeys, parentBoo, booKey } = booInfo;
+	const { booType: __booType, parentKeys: __layerKeys, parentBoo, booKey, optimizeHook } = booInfo;
 
 	const __parentBoo = parentBoo; // only for valid branch. should not
 	const __booId = __parentBoo?.__booId ? `${__parentBoo.__booId}.${booKey}` : booKey;
@@ -29,10 +30,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	};
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
 
-	const init = () =>
-		booKey
-			? (stripPeeka(_getObjByKey(__store.initData, __layerKeys)[booKey]) as T)
-			: (stripPeeka(_getObjByKey(__store.initData, __layerKeys)) as T);
+	const init = () => stripPeeka(_getObjByKey(__store.initData, __layerKeys)[booKey]) as T;
 
 	// core algorithm:
 	// save the value in the store both in the saved, and data at the same time.
@@ -67,10 +65,15 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 				currParent = currParent.__parentBoo;
 			}
 			tempIdSet.add(__booUId);
-
+			const getIdSet = () => {
+				if (optimizeHook) {
+					const idsToCheck = [...tempIdSet].filter(id => __store.hookRegisteredCount(id) > 0);
+					return new Set(idsToCheck);
+				}
+				return tempIdSet;
+			};
 			// filter out if there are no
-			const idsToCheck = [...tempIdSet]; //.filter(id => __store.hookRegisteredCount(id) > 0);
-			const idSet = new Set(idsToCheck);
+			const idSet = getIdSet();
 
 			if (window !== undefined) {
 				window.dispatchEvent(

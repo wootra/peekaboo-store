@@ -1,3 +1,4 @@
+import { peeka } from 'src/peeka';
 import { createPeekaboo } from 'src/Peekaboo';
 
 describe('Peekaboo', () => {
@@ -17,6 +18,40 @@ describe('Peekaboo', () => {
 			it('should get init value', () => {
 				store.data.key1._boo.set('value2');
 				expect(store.data.key1._boo.init()).toBe('value');
+			});
+		});
+
+		describe('peeka and array', () => {
+			const peekaObj = peeka({ p1: 123, p2: 223 });
+			const peekaArr = peeka([1, 2, 3]);
+			const arr = [1, 2, 3];
+			const initData = {
+				route: { a: 91, b: 92, arr, c: { d: '9a', e: true, parr: peekaArr }, p: peekaObj },
+			};
+			let store = createPeekaboo(initData);
+			beforeEach(() => {
+				store = createPeekaboo(initData);
+			});
+
+			it('should get array as it is', () => {
+				expect(store.data.route.arr._boo.get()).toEqual([1, 2, 3]);
+			});
+
+			it('should set array with given data, update reference', () => {
+				const arr2 = [3, 4, 5];
+				store.data.route.arr._boo.set(arr2);
+				expect(store.data.route.arr._boo.get()).toEqual(arr2);
+				expect(store.data.route.arr._boo.get()).toStrictEqual(arr2);
+				expect(store.data.route.arr._boo.get()).not.toStrictEqual(arr);
+			});
+
+			it('should set array with given data even though the same values, update reference', () => {
+				const arr2 = [1, 2, 3];
+				store.data.route.arr._boo.set(arr2);
+				expect(store.data.route.arr._boo.get()).toEqual(arr2);
+				expect(store.data.route.arr._boo.get()).toStrictEqual(arr2);
+				expect(store.data.route.arr._boo.get()).toStrictEqual(arr);
+				expect(store.data.route.arr._boo.get()).not.toBe(arr);
 			});
 		});
 

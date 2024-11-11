@@ -5,8 +5,8 @@ import { createStore } from './createStore';
 import { createBooUid } from './createBooUid';
 
 function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(initData: U): PeekabooObj<U> {
-	if (!initData || typeof initData !== 'object') {
-		throw new Error('Peekaboo initData must be an object');
+	if (!initData || typeof initData !== 'object' || Object.keys(initData).length === 0) {
+		throw new Error('Peekaboo initData must be an object, and not empty');
 	}
 	// make 2 copies to prevent mutation
 

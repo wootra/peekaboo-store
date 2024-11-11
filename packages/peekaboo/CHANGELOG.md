@@ -1,5 +1,8 @@
 # Change Logs
 
+## 1.6.0
+architecture change to fix the update bugs.
+
 ## 1.5.1
 update README
 

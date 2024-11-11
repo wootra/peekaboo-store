@@ -23,9 +23,9 @@ export const usePeekaboo = <T>(boo: BooType<T>, setState: (_val: T) => void) => 
 		}
 	};
 	window.addEventListener(UPDATE_VALUE, listener);
-	boo.__store.registerHook(boo);
+	boo.__store.registerHook(boo.__booUId);
 	return () => {
 		window.removeEventListener(UPDATE_VALUE, listener);
-		boo.__store.unregisterHook(boo);
+		boo.__store.unregisterHook(boo.__booUId);
 	};
 };
