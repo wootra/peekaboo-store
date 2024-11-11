@@ -16,10 +16,10 @@ describe('content', () => {
 		it('should get all contents with dot notation', () => {
 			const content = getContent(store);
 			expect(content).toEqual({
-				'key1.key2': 'value',
-				'key1.key3': 12,
-				'key1.key4': true,
-				key2: 123,
+				'data.key1.key2': 'value',
+				'data.key1.key3': 12,
+				'data.key1.key4': true,
+				'data.key2': 123,
 			});
 		});
 	});
@@ -27,7 +27,7 @@ describe('content', () => {
 	describe('getContentAsObject', () => {
 		it('should get all contents as object', () => {
 			const content = getContentAsObject(store);
-			expect(content).toEqual(defaultVal);
+			expect(content).toStrictEqual({ data: defaultVal });
 		});
 	});
 });

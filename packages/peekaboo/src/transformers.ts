@@ -1,3 +1,4 @@
+import { isDataTypeSame } from './isDataTypeSame';
 import { isPeekaType } from './peeka';
 import { OrgTypes, PeekaType } from './types';
 
@@ -126,6 +127,45 @@ const syncAndCollectChanged = (
 	}
 };
 
+const updateDataIfTypeSame = (target: Record<string, any>, key: string, value: any, parentKeyStack: string[]) => {
+	if (!isDataTypeSame(target[key], value, [...parentKeyStack, key])) {
+		return;
+	}
+	target[key] = value;
+};
+
+const updateValuesInObjByKey = (
+	initData: Record<string, any>, // structure to keep. should check peeka type from here.
+	updatedObj: Record<string, any>, // values to update. should have matching structure with objToSync
+	objToSync: Record<string, any>, // target object to update.
+	keyToUpdate: string, // target item to update.
+	parentKeysStacks: string[] = []
+) => {
+	if (updatedObj[keyToUpdate] === undefined) return false;
+
+	if (typeof initData !== 'object' || typeof updatedObj !== 'object' || typeof objToSync !== 'object') {
+		throw new Error('wrong usage. should be used only for object type since its reference should be updated.');
+	}
+
+	if (isPeekaType(initData[keyToUpdate]) || typeof initData[keyToUpdate] !== 'object') {
+		if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
+			updateDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
+		}
+	} else {
+		if (typeof initData[keyToUpdate] === 'object' && Array.isArray(initData[keyToUpdate])) {
+			if (initData[keyToUpdate] !== updatedObj[keyToUpdate]) {
+				updateDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
+			}
+		}
+		for (const key in initData[keyToUpdate]) {
+			updateValuesInObjByKey(initData[keyToUpdate], updatedObj[keyToUpdate], objToSync[keyToUpdate], key, [
+				...parentKeysStacks,
+				keyToUpdate,
+			]);
+		}
+	}
+};
+
 /**
  * tet object's value accessed by keys array.
  * if the node in the middle does not exist, return undefined.
@@ -193,4 +233,6 @@ export {
 	_getObjByKey,
 	stripPeeka,
 	syncAndCollectChanged,
+	updateValuesInObjByKey,
+	updateDataIfTypeSame,
 };

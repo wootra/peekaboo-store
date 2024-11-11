@@ -33,9 +33,11 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(init
 	return {
 		storeId: `peekabooStore-${storeId}`,
 		booMap: {},
-		snapshot, // used only for comparison
+		snapshot: {
+			data: snapshot,
+		}, // used only for comparison
 		data, // will be returned to the user
-		initData: cloned,
+		initData: { data: cloned },
 		hookRegisteredCount: (id: string) => {
 			return hookRegisteredCount[id] ?? 0;
 		},

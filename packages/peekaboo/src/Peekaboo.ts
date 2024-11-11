@@ -13,14 +13,14 @@ function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(i
 	const store = createStore<U>(initData);
 	const converted = {} as PeekabooParsed<U>;
 	const rootBoo = createBooObj<U>(store, {
-		booKey: '',
+		booKey: 'data',
 		booType: 'branch',
 		parentBoo: null,
 		parentKeys: [],
 	});
-	createBooLayers(store, initData, rootBoo, converted, []);
+	createBooLayers(store, initData, rootBoo, converted, ['data']);
 	converted._boo = rootBoo;
-	const currUID = createBooUid(store, '');
+	const currUID = createBooUid(store, 'data');
 	store.booMap[currUID] = rootBoo as BooType<unknown>;
 
 	return {

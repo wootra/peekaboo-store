@@ -1,5 +1,7 @@
 import { createBooUidFromLayer } from './createBooUid';
+import { isDataTypeSame } from './isDataTypeSame';
 import { isPeekaType } from './peeka';
+import { updateDataIfTypeSame } from './transformers';
 import { PeekaType, Store } from './types';
 
 const reinitialize = (
@@ -19,19 +21,20 @@ const reinitialize = (
 	store.booMap[booUid].__resetUsage();
 	if (!keyToUpdate) {
 		for (const key in initData) {
-			reinitialize(store, initData, updatedObj[key], key, [...parentKeysStacks, keyToUpdate]);
+			reinitialize(store, initData, updatedObj[key], key, [...parentKeysStacks]);
 		}
 	} else {
 		if (isPeekaType(initData[keyToUpdate])) {
-			(initData[keyToUpdate] as PeekaType<any>).init = updatedObj;
+			const peekaData = initData[keyToUpdate] as PeekaType<any>;
+			const isSame = isDataTypeSame(peekaData.init, updatedObj, [...parentKeysStacks, keyToUpdate]);
+			if (isSame) {
+				peekaData.init = updatedObj;
+			}
 		} else if (typeof initData[keyToUpdate] !== 'object') {
-			initData[keyToUpdate] = updatedObj;
+			updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
 		} else {
 			if (Array.isArray(initData[keyToUpdate])) {
-				if (initData[keyToUpdate] !== updatedObj) {
-					initData[keyToUpdate] = updatedObj;
-				}
-				return;
+				updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
 			}
 			for (const key in initData[keyToUpdate]) {
 				reinitialize(store, initData[keyToUpdate], updatedObj[key], key, [...parentKeysStacks, keyToUpdate]);

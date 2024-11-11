@@ -1,2 +1,1 @@
 export const UPDATE_VALUE = 'PEEKABOO_UPDATE_VALUE-';
-export const INIT_VALUE = 'PEEKABOO_INIT_VALUE-';

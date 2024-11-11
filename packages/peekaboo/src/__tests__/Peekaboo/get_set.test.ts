@@ -44,6 +44,13 @@ describe('Peekaboo', () => {
 				expect(store.data.route2.key1._boo.get()).toBe('value');
 			});
 
+			it('should set type matching value when update value is mixed with wrong type', () => {
+				expect(store.data.route1._boo.get()).toStrictEqual({ key1: 'value', key2: 123, key3: true });
+				// @ts-ignore
+				store.data.route1._boo.set({ key1: 'changed', key2: 'wrong-type', key3: true });
+				expect(store.data.route1._boo.get()).toStrictEqual({ key1: 'changed', key2: 123, key3: true });
+			});
+
 			it('should set value in parent', () => {
 				expect(store.data.threeLayer.twoLayer.key1._boo.get()).toEqual('value');
 				expect(store.data.threeLayer.twoLayer._boo.get()).toEqual({ key1: 'value', key2: 123, key3: true });

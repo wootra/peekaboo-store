@@ -1,7 +1,7 @@
 type Store = {
 	storeId: `peekabooStore-${number}`;
-	initData: Record<string, any>; // cloned version of init data which was used when creating Peekaboo
-	snapshot: Record<string, any>; // data that will be used for the comparison
+	initData: { data: Record<string, any> }; // cloned version of init data which was used when creating Peekaboo
+	snapshot: { data: Record<string, any> }; // data that will be used for the comparison
 	data: Record<string, any>; // data that will be used
 	booMap: Record<string, BooType<unknown>>;
 	hookRegisteredCount: (_id: string) => number; // key: booUId, value: count of register

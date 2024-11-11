@@ -1,7 +1,7 @@
 'use client';
 
 import { BooType, UpdateDetail } from '../types';
-import { INIT_VALUE, UPDATE_VALUE } from '../consts';
+import { UPDATE_VALUE } from '../consts';
 import { validateBoo } from '../utils';
 
 export const usePeekaboo = <T>(boo: BooType<T>, setState: (_val: T) => void) => {
@@ -14,7 +14,7 @@ export const usePeekaboo = <T>(boo: BooType<T>, setState: (_val: T) => void) => 
 			ev.type === UPDATE_VALUE &&
 			ev.detail.idSet?.has(boo?.__booUId) &&
 			ev.detail.storeId === boo?.__store.storeId;
-		const shouldInit = ev.type === INIT_VALUE && ev.detail.storeId === boo?.__store.storeId;
+		const shouldInit = ev.detail.storeId === boo?.__store.storeId;
 		if (shouldUpdate || shouldInit) {
 			if (state !== boo.get()) {
 				state = boo.get();
@@ -23,11 +23,9 @@ export const usePeekaboo = <T>(boo: BooType<T>, setState: (_val: T) => void) => 
 		}
 	};
 	window.addEventListener(UPDATE_VALUE, listener);
-	window.addEventListener(INIT_VALUE, listener);
 	boo.__store.registerHook(boo);
 	return () => {
 		window.removeEventListener(UPDATE_VALUE, listener);
-		window.removeEventListener(INIT_VALUE, listener);
 		boo.__store.unregisterHook(boo);
 	};
 };

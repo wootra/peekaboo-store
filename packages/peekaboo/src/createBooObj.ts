@@ -1,8 +1,7 @@
 import { UPDATE_VALUE } from './consts';
 import { createBooUid, createBooUidFromLayer } from './createBooUid';
-import { isDataTypeSame } from './isDataTypeSame';
 import { reinitialize } from './reinitialize';
-import { _getObjByKey, _setObjByKey, stripPeeka, syncAndCollectChanged } from './transformers';
+import { _getObjByKey, stripPeeka, syncAndCollectChanged, updateValuesInObjByKey } from './transformers';
 import { BooNodeType, BooType, PartialType, Store, UpdateDetail } from './types';
 
 type BooInfo = {
@@ -30,7 +29,10 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	};
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
 
-	const init = () => stripPeeka(_getObjByKey(__store.initData, __layerKeys)[booKey]) as T;
+	const init = () =>
+		booKey
+			? (stripPeeka(_getObjByKey(__store.initData, __layerKeys)[booKey]) as T)
+			: (stripPeeka(_getObjByKey(__store.initData, __layerKeys)) as T);
 
 	// core algorithm:
 	// save the value in the store both in the saved, and data at the same time.
@@ -45,23 +47,15 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	// - clear tempIdSet
 	// - update snapshot to match with value
 	const set = (newValue: T | PartialType<T>) => {
-		const initValue = init();
-
-		if (!isDataTypeSame(initValue, newValue)) {
-			console.warn(
-				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newValue}. ignoring...`
-			);
-			return;
-		}
 		const tempIdSet = new Set<string>();
 		const initDataObj = _getObjByKey(__store.initData, __layerKeys);
-		const dataObj = _getObjByKey(__store.data, __layerKeys);
+		const dataObj = _getObjByKey(__store, __layerKeys);
 		const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 		const onChanged = (arr: string[]) => {
 			tempIdSet.add(createBooUidFromLayer(__store, arr));
 		};
 
-		_setObjByKey(dataObj, newValue, [booKey]);
+		updateValuesInObjByKey(initDataObj, { [booKey]: newValue }, dataObj, booKey);
 		const isChanged = syncAndCollectChanged(initDataObj, dataObj, snapshotObj, booKey, onChanged);
 		if (isChanged) {
 			// when found some value is changed in the below level,
@@ -100,13 +94,8 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const __initialize = (newVal?: T | PartialType<T>) => {
 		const initValue = init();
 		const newValToSet = newVal ?? (initValue as PartialType<T>);
-		if (!isDataTypeSame(initValue, newValToSet)) {
-			console.warn(
-				`[${__booId}] Type mismatch. Expected ${typeof initValue} but got ${typeof newVal}. ignoring...`
-			);
-			return;
-		}
-		const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+
+		const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
 
 		reinitialize(__store, initDataObj, newVal, booKey, __layerKeys);
 		set(newValToSet);
@@ -135,7 +124,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const get = () => {
 		usageInfo.isUsed = true;
 		usageInfo.isEverUsed = true;
-		return _getObjByKey(__store.data, __layerKeys)[booKey] as T;
+		return _getObjByKey(__store, __layerKeys)[booKey] as T;
 	};
 
 	const boo: BooType<T> = {

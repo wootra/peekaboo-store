@@ -6,6 +6,7 @@ import {
 	syncAndCollectChanged,
 	cloneInitData,
 	sanitizeInitData,
+	updateValuesInObjByKey,
 } from 'src/transformers';
 
 describe('transformers', () => {
@@ -159,6 +160,27 @@ describe('transformers', () => {
 			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
 			expect(changedSet).toStrictEqual(new Set([]));
 			expect(ret).toBeFalsy();
+		});
+	});
+
+	describe('updateValuesInObjByKey', () => {
+		const peekaObj = peeka({ p1: 123, p2: 223 });
+		const peekaArr = peeka([1, 2, 3]);
+		const arr = [1, 2, 3];
+		const initData = {
+			route: { a: 91, b: 92, arr, c: { d: '9a', e: true, parr: peekaArr }, p: peekaObj },
+		};
+		let dstData: any;
+		beforeEach(() => {
+			dstData = {
+				route: { a: 91, b: 92, arr, c: { d: '9a', e: true, parr: peekaArr.init }, p: peekaObj.init },
+			};
+		});
+		it('should update value only changed', () => {
+			updateValuesInObjByKey(initData, { route: { a: 11, c: { d: '9b' } } }, dstData, 'route');
+			expect(dstData).toStrictEqual({
+				route: { a: 11, b: 92, arr, c: { d: '9b', e: true, parr: peekaArr.init }, p: peekaObj.init },
+			});
 		});
 	});
 
