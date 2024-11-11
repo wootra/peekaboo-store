@@ -18,31 +18,17 @@ const createBooLayers = (
 		if (!parsed[key]) {
 			parsed[key] = {};
 		}
-		if (obj[key] && typeof obj[key] === 'object') {
-			if (isPeekaType(obj[key]) || Array.isArray(obj[key])) {
-				newBoo = createBooObj(store, {
-					booKey: key,
-					booType: 'leaf',
-					parentBoo,
-					parentKeys: parentKeys,
-				}) as BooType<unknown>;
-			} else {
-				newBoo = createBooObj(store, {
-					booKey: key,
-					booType: 'branch',
-					parentBoo,
-					parentKeys: parentKeys,
-				}) as BooType<unknown>;
+		const isBranchType =
+			obj[key] && typeof obj[key] === 'object' && !isPeekaType(obj[key]) && !Array.isArray(obj[key]);
+		newBoo = createBooObj(store, {
+			booKey: key,
+			booType: isBranchType ? 'branch' : 'leaf',
+			parentBoo,
+			parentKeys: parentKeys,
+		}) as BooType<unknown>;
 
-				createBooLayers(store, obj[key], newBoo, parsed[key], [...parentKeys, key]);
-			}
-		} else {
-			newBoo = createBooObj(store, {
-				booKey: key,
-				booType: 'leaf',
-				parentBoo,
-				parentKeys: parentKeys,
-			}) as BooType<unknown>;
+		if (isBranchType) {
+			createBooLayers(store, obj[key], newBoo, parsed[key], [...parentKeys, key]);
 		}
 		parsed[key]._boo = newBoo;
 		store.booMap[currUID] = newBoo;

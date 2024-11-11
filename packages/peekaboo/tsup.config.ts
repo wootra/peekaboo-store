@@ -14,9 +14,10 @@ export default defineConfig({
 	// 	js: "'use client'",
 	// },
 	format: ['cjs', 'esm'],
-	external: ['react'],
+	external: ['react', 'zod'],
 	dts: true,
 	clean: true,
 	minify: true,
 	bundle: true,
+	treeshake: true,
 });

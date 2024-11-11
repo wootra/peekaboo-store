@@ -4,9 +4,6 @@ type Store = {
 	snapshot: { data: Record<string, any> }; // data that will be used for the comparison
 	data: Record<string, any>; // data that will be used
 	booMap: Record<string, BooType<unknown>>;
-	hookRegisteredCount: (_booUid: string) => number; // key: booUId, value: count of register
-	registerHook: (_booUid: string) => void;
-	unregisterHook: (_booUid: string) => void;
 };
 
 type PeekaType<K> = {

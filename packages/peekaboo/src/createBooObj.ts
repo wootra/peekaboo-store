@@ -45,12 +45,12 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	// - clear tempIdSet
 	// - update snapshot to match with value
 	const set = (newValue: T | PartialType<T>) => {
-		const tempIdSet = new Set<string>();
+		const idSet = new Set<string>();
 		const initDataObj = _getObjByKey(__store.initData, __layerKeys);
 		const dataObj = _getObjByKey(__store, __layerKeys);
 		const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 		const onChanged = (arr: string[]) => {
-			tempIdSet.add(createBooUidFromLayer(__store, arr));
+			idSet.add(createBooUidFromLayer(__store, arr));
 		};
 
 		updateValuesInObjByKey(initDataObj, { [booKey]: newValue }, dataObj, booKey);
@@ -61,19 +61,10 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 
 			let currParent = __parentBoo;
 			while (currParent) {
-				tempIdSet.add(currParent.__booUId);
+				idSet.add(currParent.__booUId);
 				currParent = currParent.__parentBoo;
 			}
-			tempIdSet.add(__booUId);
-			const getIdSet = () => {
-				if (optimizeHook) {
-					const idsToCheck = [...tempIdSet].filter(id => __store.hookRegisteredCount(id) > 0);
-					return new Set(idsToCheck);
-				}
-				return tempIdSet;
-			};
-			// filter out if there are no
-			const idSet = getIdSet();
+			idSet.add(__booUId);
 
 			if (window !== undefined) {
 				window.dispatchEvent(
