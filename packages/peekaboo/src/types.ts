@@ -1,9 +1,12 @@
 type Store = {
 	storeId: `peekabooStore-${number}`;
-	savedData: any;
-	data: Record<string, any>; // {[booUID: string]: unknow} - this is partial reference to initData
+	initData: Record<string, any>; // cloned version of init data which was used when creating Peekaboo
+	snapshot: Record<string, any>; // data that will be used for the comparison
+	data: Record<string, any>; // data that will be used
 	booMap: Record<string, BooType<unknown>>;
-	parentMap: Record<string, string>;
+	hookRegisteredCount: (_id: string) => number; // key: booUId, value: count of register
+	registerHook: (_boo: BooType<any>) => void;
+	unregisterHook: (_boo: BooType<any>) => void;
 };
 
 type PeekaType<K> = {
@@ -14,43 +17,30 @@ type PeekaType<K> = {
 type PeekabooMap<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? PeekaType<T> : K[Key];
 };
+type PartialType<T> = T extends { [Key in keyof T]: T[Key] } ? { [Key in keyof T]?: PartialType<T[Key]> } : T;
+type Setter<T> = (_value: T | PartialType<T>) => void;
 
-type Setter<T> = (_value: T, _eventBubling?: boolean, _ignoreUpdate?: boolean) => void;
-
-type BooTypeBase<T> = Readonly<{
+type BooType<T> = Readonly<{
+	__booType: BooNodeType;
 	__store: Store;
 	__booId: string;
 	__booUId: string;
 	init: () => T;
-	__initialize: (_newVal?: T) => void;
-
+	__initialize: (_newVal?: T | PartialType<T>) => void;
+	__resetUsage: () => void;
+	reset: () => void;
+	isDerived: () => boolean;
 	get: () => T;
 	set: Setter<T>;
+	__layerKeys: string[];
+	__parentBoo: BooType<any> | null;
 	__used: () => boolean;
 	__everUsed: () => boolean;
 	__allUsed: () => boolean;
 	__allEverUsed: () => boolean;
+	__waterFallRefs: Set<BooType<any>>;
+	__appendWaterFallSet: (_boo: BooType<any>) => void;
 }>;
-
-type BooKeyTypes<T> = keyof BooTypeBase<T> | '__booType' | '__childrenSet';
-
-type BranchBooType<T> =
-	T extends Omit<T, BooKeyTypes<T>>
-		? Readonly<
-				BooTypeBase<T> & {
-					__booType: 'branch';
-					__childrenBoo: Map<keyof T, { _boo: BooType<T[keyof T]> }>;
-				}
-			>
-		: never;
-
-type LeafBooType<T> = Readonly<
-	BooTypeBase<T> & {
-		__booType: 'leaf';
-	}
->;
-
-type BooType<T> = LeafBooType<T> | BranchBooType<T>;
 
 type UpdateDetail<T> = Readonly<{
 	idSet?: Set<string>;
@@ -67,7 +57,7 @@ type PeekabooParsed<K> = {
 		: K[Key] extends string | number | boolean | null | undefined
 			? { _boo: BooType<K[Key]> }
 			: PeekabooParsed<K[Key]> & { _boo: BooType<K[Key]> };
-};
+} & { _boo: BooType<K> };
 
 type CreateSliceType<
 	U extends { [Key in keyof U & `_${string}`]: U[Key] },
@@ -91,14 +81,11 @@ type PartialOrgTypes<K> = {
 type PeekabooObjSourceData<U> = U extends PeekabooObj<infer T> ? OrgTypes<T> : U;
 type PeekabooObjPartialSourceData<U> = U extends PeekabooObj<infer T> ? PartialOrgTypes<T> : U;
 
-type BooNodeType = 'leaf' | 'all' | 'branch';
+type BooNodeType = 'leaf' | 'branch';
 
 export type {
 	Store,
 	BooType,
-	BooTypeBase,
-	LeafBooType,
-	BranchBooType,
 	PeekabooParsed,
 	PeekabooObj,
 	Setter,
@@ -109,8 +96,8 @@ export type {
 	PeekabooObjSourceData,
 	PeekabooObjPartialSourceData,
 	UpdateDetail,
-	BooKeyTypes,
 	BooNodeType,
 	OrgTypes,
 	PartialOrgTypes,
+	PartialType,
 };

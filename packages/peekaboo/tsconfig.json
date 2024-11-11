@@ -4,7 +4,7 @@
 	"exclude": ["dist", "build", "node_modules", "tsup.config.ts"],
 	"compilerOptions": {
 		"outDir": "dist",
-		"rootDir": "src",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationDir": "dist",
 		"baseUrl": "."

@@ -4,8 +4,8 @@
 	"exclude": ["dist", "build", "node_modules", "tsup.config.ts"],
 	"compilerOptions": {
 		"types": ["vitest/globals"],
-		"outDir": "dist",
-		"rootDir": "src",
+		"outDir": ".",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationDir": "dist",
 		"baseUrl": "."

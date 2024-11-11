@@ -37,19 +37,19 @@ function updatePeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	if (!initData || typeof initData !== 'object') {
 		throw new Error('Peekaboo initData must be an object');
 	}
-	const store = peekaboo.store;
-	update<U>(store, initData, '');
+	peekaboo.data._boo.__initialize(initData as U);
+	// update<U>(store, initData, '');
 
-	if (window !== undefined) {
-		window.dispatchEvent(
-			new CustomEvent<UpdateDetail<U>>(INIT_VALUE, {
-				detail: {
-					storeId: store.storeId,
-					forceRender: true,
-				},
-			})
-		);
-	}
+	// if (window !== undefined) {
+	// 	window.dispatchEvent(
+	// 		new CustomEvent<UpdateDetail<U>>(INIT_VALUE, {
+	// 			detail: {
+	// 				storeId: store.storeId,
+	// 				forceRender: true,
+	// 			},
+	// 		})
+	// 	);
+	// }
 }
 
 export { updatePeekaboo };

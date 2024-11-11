@@ -6,7 +6,7 @@ import Updated from 'components/Updated';
 import Trigger from 'components/Trigger';
 import { peekaboo } from 'app/dynamic/_data/const';
 import { createSlice } from 'peekaboo-store/utils/slices';
-import { BooNodeType, getUsageLog, IncludeType } from 'peekaboo-store/utils/usage';
+import { BooNodeTypeToSelect, getUsageLog, IncludeType } from 'peekaboo-store/utils/usage';
 import { getContent, getContentAsObject } from 'peekaboo-store/utils/content';
 
 const page2HeaderSlice = createSlice(peekaboo, data => data.routes.page2.header);
@@ -16,7 +16,7 @@ const subTitles = ['subTitle1', 'subTitle2'];
 export default function Page() {
 	useEffect(() => {
 		// @ts-ignore
-		window.getUsageLog = function (nodeType: BooNodeType = 'all', includes: IncludeType = 'all') {
+		window.getUsageLog = function (nodeType: BooNodeTypeToSelect = 'all', includes: IncludeType = 'all') {
 			return getUsageLog(peekaboo, nodeType, includes);
 		};
 		// @ts-ignore
