@@ -25,7 +25,7 @@ export default function Page() {
 		window.getContentAsObject = () => getContentAsObject(peekaboo);
 	}, []);
 	const arrays = useMemo(() => {
-		return new Array(10).fill(null).map((_, idx) => {
+		return new Array(1000).fill(null).map((_, idx) => {
 			return (
 				<div key={`id_${idx}`}>
 					<Updated boo={page2HeaderSlice().subTitle._boo} />
