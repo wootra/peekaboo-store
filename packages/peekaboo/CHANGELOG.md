@@ -1,5 +1,9 @@
 # Change Logs
 
+## 1.7.0
+performance optimization
+change vanilla event handler's name as it is not a hook.
+
 ## 1.6.0
 architecture change to fix the update bugs.
 fill up unit tests
