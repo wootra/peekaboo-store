@@ -1,4 +1,6 @@
 # Change Logs
+## 1.7.1
+fix: branch boo was not triggering rendering
 
 ## 1.7.0
 performance optimization
