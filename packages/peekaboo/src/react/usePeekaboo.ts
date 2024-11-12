@@ -19,8 +19,11 @@ export const usePeekaboo = <T>(boo: BooType<T>) => {
 
 			if (shouldUpdate) {
 				const updated = boo.get() as T;
-
-				setState(updated);
+				if (boo.__booType === 'branch') {
+					setState({ ...updated });
+				} else {
+					setState(updated);
+				}
 			}
 		};
 		if (typeof window !== 'undefined') {
