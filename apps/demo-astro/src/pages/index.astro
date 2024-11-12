@@ -34,7 +34,7 @@ import Layout from '../layouts/Layout.astro';
 	}
 </style>
 <script >
-	import {usePeekaboo} from 'peekaboo-store/vanilla';
+	import {addBooEvent} from 'peekaboo-store/vanilla';
 	import {createPeekaboo} from 'peekaboo-store';
 	const randomValue = Math.round(Math.random()*10000);
 	const store = createPeekaboo({
@@ -65,14 +65,14 @@ import Layout from '../layouts/Layout.astro';
 		store.data.header1._boo.set(2);
 	});
 	
-	usePeekaboo(store.data.header1._boo, (v)=>{
+	const removeEvent1 = addBooEvent(store.data.header1._boo, (v)=>{
 		const el = document.querySelector('#header1 .content');
 		if(el){
 			el.innerHTML = `${v}`;
 		}
 	});
 
-	usePeekaboo(store.data.header2.content._boo, (v)=>{
+	const removeEvent2 = addBooEvent(store.data.header2.content._boo, (v)=>{
 		const el = document.querySelector('#header2 .content');
 		if(el){
 			el.innerHTML = `${v}`;

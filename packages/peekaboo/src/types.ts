@@ -1,9 +1,10 @@
 type Store = {
-	storeId: `peekabooStore-${number}`;
+	storeId: string;
 	initData: { data: Record<string, any> }; // cloned version of init data which was used when creating Peekaboo
 	snapshot: { data: Record<string, any> }; // data that will be used for the comparison
 	data: Record<string, any>; // data that will be used
 	booMap: Record<string, BooType<unknown>>;
+	triggerDispatch: (_idSet: Set<string>) => void;
 };
 
 type PeekaType<K> = {
@@ -39,10 +40,9 @@ type BooType<T> = Readonly<{
 	__appendWaterFallSet: (_boo: BooType<any>) => void;
 }>;
 
-type UpdateDetail<T> = Readonly<{
+type UpdateDetail = Readonly<{
 	idSet?: Set<string>;
 	storeId: string;
-	current?: T;
 	forceRender?: boolean;
 }>;
 
@@ -80,6 +80,17 @@ type PeekabooObjPartialSourceData<U> = U extends PeekabooObj<infer T> ? PartialO
 
 type BooNodeType = 'leaf' | 'branch';
 
+type PeekabooOptions = {
+	/**
+	 * for server side rendering, to prevent hydrate mismatch issue.
+	 */
+	staticId?: string;
+	/**
+	 * @default 100
+	 */
+	eventOptimizeInMs: number;
+};
+
 export type {
 	Store,
 	BooType,
@@ -97,4 +108,5 @@ export type {
 	OrgTypes,
 	PartialOrgTypes,
 	PartialType,
+	PeekabooOptions,
 };

@@ -1,7 +1,7 @@
 # Peekaboo! (peekaboo-store)
 
 ---
-| ![peekaboo](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/peekaboo.png?raw=true) |
+![peekaboo](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/peekaboo.png?raw=true)
 ---
 
 Peekaboo (peekaboo-store) is a simple and lightweight store management library.
@@ -20,12 +20,14 @@ With peekaboo-store, we will have full-typescript support for the data structure
 
 ## Power of peekaboo-store
 
-- lightweight! (core is 2.85kB, react hook is 742B)
-- event driven content update
+- lightweight! (core is 2.7kB, react hook is 742B)
+- Optimized event driven content update (you can choose rendering speed. (default is 10/s=100ms ))
 - content organize(manage your CMS system). hook managed labels will help you to update your SPA without full-reload.
+- virtual snapshot behind presentation layer(like Virtual DOM)
 - dynamic full content update support
 - default value decides type automatically.
-- very simple usage ( minimum boilerplate ). No Provider needed!
+- Simple, intuitive usage. Just use get/set!
+- optimal for widget based application! No global provider, No boilerplate. 
 
 ## Demo
 
@@ -328,3 +330,24 @@ const parsed = schema.parse({key1: 'other-value'}); // okay!
 const parsed2 = schema.parse({key1: 999}); // will throw error!
 const parsed3 = schema.parse({key1: 'val', key3: 'test'}); // will return {key1: 'val'} only since key3 is not registered value!
 ```
+
+## Rendering Optimization
+
+Even though you updated your content really fast(using _boo.set function), `peekaboo-store` will manage its event not to slow down your application. By default it re-render the changed part every 0.1s, but you can adjust it as needed.
+
+```typescript
+const peekaboo = createPeekaboo(initValue, {
+	// staticId?: string;
+    eventOptimizeInMs: 200, // max 5times/s 
+});
+...
+setInterval(()=>{
+	for(let i=0; i<10000; i++){
+		boo.set(i);
+	}
+}, 100);
+...
+const val = usePeekaboo(boo); // this will be called not faster than 5times/s 
+
+```
+

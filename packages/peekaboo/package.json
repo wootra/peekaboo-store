@@ -1,6 +1,6 @@
 {
 	"name": "peekaboo-store",
-	"version": "1.6.0",
+	"version": "1.6.1-1",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
@@ -37,7 +37,7 @@
 		"pre-patch": "sh ./publish.sh prepatch",
 		"pre-minor": "sh ./publish.sh preminor",
 		"pre-major": "sh ./publish.sh premajor",
-		"pre-release": "sh ./publish.sh prerelease",
+		"pre": "sh ./publish.sh prerelease",
 		"patch": "sh ./publish.sh patch",
 		"minor": "sh ./publish.sh minor",
 		"major": "sh ./publish.sh major",

@@ -123,7 +123,12 @@ const syncAndCollectChanged = (
 	}
 };
 
-const updateDataIfTypeSame = (target: Record<string, any>, key: string, value: any, parentKeyStack: string[]) => {
+const updateDataIfTypeSame = (
+	target: Record<string, unknown>,
+	key: string,
+	value: unknown,
+	parentKeyStack: string[]
+) => {
 	if (!isDataTypeSame(target[key], value, [...parentKeyStack, key])) {
 		return;
 	}
@@ -131,9 +136,9 @@ const updateDataIfTypeSame = (target: Record<string, any>, key: string, value: a
 };
 
 const updateValuesInObjByKey = (
-	initData: Record<string, any>, // structure to keep. should check peeka type from here.
-	updatedObj: Record<string, any>, // values to update. should have matching structure with objToSync
-	objToSync: Record<string, any>, // target object to update.
+	initData: Record<string, unknown>, // structure to keep. should check peeka type from here.
+	updatedObj: Record<string, unknown>, // values to update. should have matching structure with objToSync
+	objToSync: Record<string, unknown>, // target object to update.
 	keyToUpdate: string, // target item to update.
 	parentKeysStacks: string[] = []
 ) => {
@@ -151,10 +156,13 @@ const updateValuesInObjByKey = (
 			return;
 		}
 		for (const key in initData[keyToUpdate]) {
-			updateValuesInObjByKey(initData[keyToUpdate], updatedObj[keyToUpdate], objToSync[keyToUpdate], key, [
-				...parentKeysStacks,
-				keyToUpdate,
-			]);
+			updateValuesInObjByKey(
+				initData[keyToUpdate] as Record<string, unknown>,
+				updatedObj[keyToUpdate] as Record<string, unknown>,
+				objToSync[keyToUpdate] as Record<string, unknown>,
+				key,
+				[...parentKeysStacks, keyToUpdate]
+			);
 		}
 	}
 };

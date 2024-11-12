@@ -9,10 +9,9 @@ type BooInfo = {
 	parentKeys: string[];
 	parentBoo: BooType<any> | null;
 	booKey: string;
-	optimizeHook?: boolean;
 };
 const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
-	const { booType: __booType, parentKeys: __layerKeys, parentBoo, booKey, optimizeHook } = booInfo;
+	const { booType: __booType, parentKeys: __layerKeys, parentBoo, booKey } = booInfo;
 
 	const __parentBoo = parentBoo; // only for valid branch. should not
 	const __booId = __parentBoo?.__booId ? `${__parentBoo.__booId}.${booKey}` : booKey;
@@ -22,16 +21,17 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 		isEverUsed: false,
 	};
 
-	// __store.data[__booUId] = initValue;
-
 	const __waterFallRefs = new Set<BooType<any>>();
 	const __appendWaterFallSet = (boo: BooType<any>) => {
 		__waterFallRefs.add(boo);
 	};
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
 
-	const init = () => stripPeeka(_getObjByKey(__store.initData, __layerKeys)[booKey]) as T;
+	const dataObj = _getObjByKey(__store, __layerKeys);
+	const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+	const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 
+	const init = () => stripPeeka(initDataObj[booKey]) as T;
 	// core algorithm:
 	// save the value in the store both in the saved, and data at the same time.
 	// for peeka node, should update the data itself, but if not, should update following algorithm:
@@ -46,9 +46,9 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	// - update snapshot to match with value
 	const set = (newValue: T | PartialType<T>) => {
 		const idSet = new Set<string>();
-		const initDataObj = _getObjByKey(__store.initData, __layerKeys);
-		const dataObj = _getObjByKey(__store, __layerKeys);
-		const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
+		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+		// const dataObj = _getObjByKey(__store, __layerKeys);
+		// const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 		const onChanged = (arr: string[]) => {
 			idSet.add(createBooUidFromLayer(__store, arr));
 		};
@@ -65,19 +65,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 				currParent = currParent.__parentBoo;
 			}
 			idSet.add(__booUId);
-
-			if (window !== undefined) {
-				window.dispatchEvent(
-					new CustomEvent(UPDATE_VALUE, {
-						detail: {
-							idSet: idSet,
-							storeId: __store.storeId,
-							current: newValue,
-							forceRender: true, // __booType === 'branch',
-						} as UpdateDetail<T>,
-					})
-				);
-			}
+			__store.triggerDispatch(idSet);
 		}
 	};
 
@@ -89,7 +77,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 		const initValue = init();
 		const newValToSet = newVal ?? (initValue as PartialType<T>);
 
-		const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
+		// const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
 
 		reinitialize(__store, initDataObj, newVal, booKey, __layerKeys);
 		set(newValToSet);
@@ -118,7 +106,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const get = () => {
 		usageInfo.isUsed = true;
 		usageInfo.isEverUsed = true;
-		return _getObjByKey(__store, __layerKeys)[booKey] as T;
+		return dataObj[booKey] as T;
 	};
 
 	const boo: BooType<T> = {
