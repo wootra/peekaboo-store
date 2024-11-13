@@ -1,4 +1,8 @@
 # Change Logs
+
+## 1.7.3
+fix: change behavior for null or undefined type for initData. it will allow update regardless of type.
+
 ## 1.7.2
 fix: when value was null, an empty object was added.
 
