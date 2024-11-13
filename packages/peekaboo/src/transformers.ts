@@ -8,7 +8,7 @@ function cloneInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest
 			dest[key] = initData[key]; // do not clone more.
 			continue;
 		}
-		if (typeof initData[key] === 'object') {
+		if (initData[key] && typeof initData[key] === 'object') {
 			if (Array.isArray(initData[key])) {
 				dest[key] = initData[key]; // do not clone more.
 				continue;
@@ -31,7 +31,7 @@ function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, d
 			dest[key] = (initData[key] as PeekaType<T[keyof T]>).init;
 			continue;
 		}
-		if (typeof initData[key] === 'object') {
+		if (initData[key] && typeof initData[key] === 'object') {
 			if (Array.isArray(initData[key])) {
 				dest[key] = initData[key]; // array should be as it is.
 			} else {

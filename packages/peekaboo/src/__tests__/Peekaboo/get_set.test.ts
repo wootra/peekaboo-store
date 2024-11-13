@@ -21,6 +21,31 @@ describe('Peekaboo', () => {
 			});
 		});
 
+		describe('negative values', () => {
+			const defaultVal = { key1: null, key2: 0, key3: undefined };
+			let store: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
+			beforeEach(() => {
+				store = createPeekaboo(defaultVal);
+			});
+			it('should get null', () => {
+				expect(store.data.key1._boo.get()).toBe(null);
+			});
+
+			it('should get 0', () => {
+				expect(store.data.key2._boo.get()).toBe(0);
+			});
+
+			it('should get 0 and should set 1', () => {
+				expect(store.data.key2._boo.get()).toBe(0);
+				store.data.key2._boo.set(1);
+				expect(store.data.key2._boo.get()).toBe(1);
+			});
+
+			it('should get undefined', () => {
+				expect(store.data.key3._boo.get()).toBe(undefined);
+			});
+		});
+
 		describe('peeka and array', () => {
 			const peekaObj = peeka({ p1: 123, p2: 223 });
 			const peekaArr = peeka([1, 2, 3]);
