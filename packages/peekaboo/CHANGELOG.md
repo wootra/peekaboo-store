@@ -1,4 +1,7 @@
 # Change Logs
+## 1.7.2
+fix: when value was null, an empty object was added.
+
 ## 1.7.1
 fix: branch boo was not triggering rendering
 
