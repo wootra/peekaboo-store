@@ -1,8 +1,7 @@
-import { UPDATE_VALUE } from './consts';
 import { createBooUid, createBooUidFromLayer } from './createBooUid';
 import { reinitialize } from './reinitialize';
 import { _getObjByKey, stripPeeka, syncAndCollectChanged, updateValuesInObjByKey } from './transformers';
-import { BooNodeType, BooType, PartialType, Store, UpdateDetail } from './types';
+import { BooNodeType, BooType, PartialType, Store } from './types';
 
 type BooInfo = {
 	booType: BooNodeType;
