@@ -46,4 +46,35 @@ describe('update', () => {
 			expect(() => updatePeekaboo(testStore, true)).toThrow(errMsg);
 		});
 	});
+
+	describe('when initData holds undefiend or null', () => {
+		const defaultVal = {
+			test1: undefined,
+			test2: null,
+			test3: {
+				test31: undefined,
+				test32: null,
+			},
+		};
+		let testStore: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
+		beforeEach(() => {
+			testStore = createPeekaboo(defaultVal);
+		});
+
+		it('should update value', () => {
+			const converted = {
+				test1: 11,
+				test3: {
+					test31: '311',
+				},
+			};
+
+			updatePeekaboo(testStore, converted);
+
+			expect(testStore.data.test1._boo.get()).toBe(converted.test1);
+			expect(testStore.data.test2._boo.get()).toBe(defaultVal.test2);
+			expect(testStore.data.test3.test31._boo.get()).toBe(converted.test3.test31);
+			expect(testStore.data.test3.test32._boo.get()).toBe(defaultVal.test3.test32);
+		});
+	});
 });

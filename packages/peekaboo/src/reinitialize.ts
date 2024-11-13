@@ -1,7 +1,7 @@
 import { createBooUidFromLayer } from './createBooUid';
 import { isDataTypeSame } from './isDataTypeSame';
 import { isPeekaType } from './peeka';
-import { updateDataIfTypeSame } from './transformers';
+import { replaceDataIfTypeSame } from './transformers';
 import { PeekaType, Store } from './types';
 
 const reinitialize = (
@@ -31,11 +31,15 @@ const reinitialize = (
 		if (isSame) {
 			peekaData.init = updatedObj;
 		}
-	} else if (typeof initData[keyToUpdate] !== 'object') {
-		updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
+	} else if (
+		typeof initData[keyToUpdate] !== 'object' ||
+		initData[keyToUpdate] === null ||
+		initData[keyToUpdate] === undefined
+	) {
+		replaceDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
 	} else {
 		if (Array.isArray(initData[keyToUpdate])) {
-			updateDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
+			replaceDataIfTypeSame(initData, keyToUpdate, updatedObj, parentKeysStacks);
 			return;
 		}
 		for (const key in initData[keyToUpdate]) {

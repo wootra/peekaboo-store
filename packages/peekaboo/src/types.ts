@@ -13,9 +13,17 @@ type PeekaType<K> = {
 };
 
 type PeekabooMap<K> = {
-	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? PeekaType<T> : K[Key];
+	[Key in keyof K]: K[Key] extends PeekaType<infer T>
+		? PeekaType<T>
+		: K[Key] extends null | undefined
+			? unknown
+			: K[Key];
 };
-type PartialType<T> = T extends { [Key in keyof T]: T[Key] } ? { [Key in keyof T]?: PartialType<T[Key]> } : T;
+type PartialType<T> = T extends { [Key in keyof T]: T[Key] }
+	? { [Key in keyof T]?: PartialType<T[Key]> }
+	: T extends undefined | null
+		? unknown
+		: T;
 type Setter<T> = (_value: T | PartialType<T>) => void;
 
 type BooType<T> = Readonly<{
@@ -51,9 +59,11 @@ type BooDataType<T> = T extends BooType<infer X> ? X : never;
 type PeekabooParsed<K> = {
 	[Key in keyof K]: K[Key] extends PeekaType<infer T>
 		? { _boo: BooType<T> }
-		: K[Key] extends string | number | boolean | null | undefined
+		: K[Key] extends string | number | boolean
 			? { _boo: BooType<K[Key]> }
-			: PeekabooParsed<K[Key]> & { _boo: BooType<K[Key]> };
+			: K[Key] extends null | undefined
+				? { _boo: BooType<unknown> }
+				: PeekabooParsed<K[Key]> & { _boo: BooType<K[Key]> };
 } & { _boo: BooType<K> };
 
 type CreateSliceType<
@@ -68,11 +78,19 @@ type PeekabooObj<U> = {
 };
 
 type OrgTypes<K> = {
-	[Key in keyof K]: K[Key] extends PeekaType<infer T> ? T : OrgTypes<K[Key]>;
+	[Key in keyof K]: K[Key] extends PeekaType<infer T>
+		? T
+		: K[Key] extends null | undefined
+			? unknown
+			: OrgTypes<K[Key]>;
 };
 
 type PartialOrgTypes<K> = {
-	[Key in keyof K]?: K[Key] extends PeekaType<infer T> ? T : PartialOrgTypes<K[Key]>;
+	[Key in keyof K]?: K[Key] extends PeekaType<infer T>
+		? T
+		: K[Key] extends null | undefined
+			? unknown
+			: PartialOrgTypes<K[Key]>;
 };
 
 type PeekabooObjSourceData<U> = U extends PeekabooObj<infer T> ? OrgTypes<T> : U;

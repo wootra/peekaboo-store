@@ -1,9 +1,10 @@
 const isDataTypeSame = (dst: any, cmp: any, logKeyLevel: string[] = []) => {
+	if (dst === null || dst === undefined) return true;
 	if (typeof dst !== typeof cmp) {
 		console.warn(`[${logKeyLevel.join('.')}] type is different. dst: ${typeof dst}, cmp: ${typeof cmp}`);
 		return false;
 	}
-	if (dst === null || cmp === null) return dst === cmp;
+
 	if (typeof dst === 'object' && typeof cmp === 'object') {
 		if (Array.isArray(dst) && Array.isArray(cmp)) {
 			const dstArr = dst as unknown[];

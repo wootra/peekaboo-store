@@ -13,7 +13,15 @@ describe('isDataTypeSame', () => {
 		expect(isDataTypeSame(1, 'a')).toBe(false);
 		expect(isDataTypeSame('a', true)).toBe(false);
 		expect(isDataTypeSame(true, null)).toBe(false);
-		expect(isDataTypeSame(null, undefined)).toBe(false);
+	});
+
+	it('should return true if dest type is null or undefined.', () => {
+		expect(isDataTypeSame(null, null)).toBe(true);
+		expect(isDataTypeSame(null, undefined)).toBe(true);
+		expect(isDataTypeSame(null, 1)).toBe(true);
+		expect(isDataTypeSame(null, 'a')).toBe(true);
+		expect(isDataTypeSame(null, true)).toBe(true);
+		expect(isDataTypeSame(null, {})).toBe(true);
 	});
 
 	it('should return true if full object matches', () => {

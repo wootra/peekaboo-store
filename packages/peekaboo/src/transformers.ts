@@ -53,7 +53,7 @@ function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, d
  */
 const stripPeeka = (value: any) => {
 	if (isPeekaType(value)) return (value as PeekaType<unknown>).init;
-	if (typeof value === 'object' && !Array.isArray(value)) {
+	if (value && typeof value === 'object' && !Array.isArray(value)) {
 		return Object.keys(value).reduce(
 			(acc, key) => {
 				acc[key] = stripPeeka(value[key]);
@@ -78,7 +78,12 @@ const syncAndCollectChanged = (
 	const call = () => {
 		onChanged([...parentKeysStacks, keyToUpdate], updatedObj[keyToUpdate]);
 	};
-	if (isPeekaType(initData[keyToUpdate]) || typeof initData[keyToUpdate] !== 'object') {
+	if (
+		isPeekaType(initData[keyToUpdate]) ||
+		typeof initData[keyToUpdate] !== 'object' ||
+		initData[keyToUpdate] === null ||
+		initData[keyToUpdate] === undefined
+	) {
 		if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
 			objToSync[keyToUpdate] = updatedObj[keyToUpdate];
 			call();
@@ -86,7 +91,11 @@ const syncAndCollectChanged = (
 		}
 		return false;
 	} else {
-		if (typeof initData[keyToUpdate] === 'object' && Array.isArray(initData[keyToUpdate])) {
+		if (
+			initData[keyToUpdate] &&
+			typeof initData[keyToUpdate] === 'object' &&
+			Array.isArray(initData[keyToUpdate])
+		) {
 			if (initData[keyToUpdate] !== updatedObj[keyToUpdate]) {
 				objToSync[keyToUpdate] = updatedObj[keyToUpdate];
 				console.warn(
@@ -101,6 +110,7 @@ const syncAndCollectChanged = (
 			}
 			return false;
 		}
+
 		let isChanged = false;
 		for (const key in initData[keyToUpdate]) {
 			if (
@@ -123,7 +133,11 @@ const syncAndCollectChanged = (
 	}
 };
 
-const updateDataIfTypeSame = (
+/**
+ * this update whole reference.
+ * use it only for leaf.
+ */
+const replaceDataIfTypeSame = (
 	target: Record<string, unknown>,
 	key: string,
 	value: unknown,
@@ -144,17 +158,27 @@ const updateValuesInObjByKey = (
 ) => {
 	if (updatedObj[keyToUpdate] === undefined) return false;
 
-	if (isPeekaType(initData[keyToUpdate]) || typeof initData[keyToUpdate] !== 'object') {
+	if (
+		isPeekaType(initData[keyToUpdate]) ||
+		typeof initData[keyToUpdate] !== 'object' ||
+		initData[keyToUpdate] === null ||
+		initData[keyToUpdate] === undefined
+	) {
 		if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
-			updateDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
+			replaceDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
 		}
 	} else {
-		if (typeof initData[keyToUpdate] === 'object' && Array.isArray(initData[keyToUpdate])) {
+		if (
+			initData[keyToUpdate] &&
+			typeof initData[keyToUpdate] === 'object' &&
+			Array.isArray(initData[keyToUpdate])
+		) {
 			if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
-				updateDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
+				replaceDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
 			}
 			return;
 		}
+
 		for (const key in initData[keyToUpdate]) {
 			updateValuesInObjByKey(
 				initData[keyToUpdate] as Record<string, unknown>,
@@ -233,5 +257,5 @@ export {
 	stripPeeka,
 	syncAndCollectChanged,
 	updateValuesInObjByKey,
-	updateDataIfTypeSame,
+	replaceDataIfTypeSame,
 };
