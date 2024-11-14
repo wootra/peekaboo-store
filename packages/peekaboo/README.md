@@ -119,9 +119,23 @@ Is `contentPeekaboo.data.header.title` too long? Don't be nervous. It will suppo
 
 ![peekaboo object is fully type supported](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/use-peekaboo-type-support.png?raw=true)
 
-## Slice (createSlice)
+## Slice (new method)
 
-Still annoying? Do you have to re-use it? No problem! use Slice.
+Still annoying? Do you have to re-use it? No problem! just use partial object. it will still support typescript.
+
+```typescript
+const titleSlice = contentPeekaboo.data.header.title;
+
+const Header = () => {
+	const titleLabel = usePeekaboo(titleSlice.label._boo);
+	const titleImage = usePeekaboo(titleSlice.image._boo);
+    ...
+```
+
+
+## Slice (createSlice) (deprecated)
+
+still support, but harder to use. Please use above method.
 
 ```typescript
 const titleSlice = createSlice(contentPeekaboo, data => data.header.title);
