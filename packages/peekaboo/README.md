@@ -28,6 +28,7 @@ With peekaboo-store, we will have full-typescript support for the data structure
 - default value decides type automatically.
 - Simple, intuitive usage. Just use get/set!
 - optimal for widget based application! No global provider, No boilerplate. 
+- support SSR! [DemoCode(SSR)](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/DataLoader.tsx)
 
 ## Demo
 
@@ -351,3 +352,20 @@ const val = usePeekaboo(boo); // this will be called not faster than 5times/s
 
 ```
 
+## Server-side rendering!
+
+Technically, it is not serverside rendering. But when the application start rendering, it can make sure the data is from server.
+this approach prevent flickering of contents when the data is loaded and renders later.
+make sure your component is mounted before the other components are rendered, and never re-rendered until the whole page is re-loaded.
+`peekaboo-store` allows you to load full-contents, partial-contents, or granullar controlling partial data.
+
+```typescript
+// the directData will be given from server-side. only different data comparing to initial data will be updated.
+const DataLoader = ({ dataDirect }: { dataDirect: object }) => {
+	updatePeekaboo(peekaboo, dataDirect); // server side data update!
+	
+	return null;
+};
+
+export default React.memo(DataLoader); // React.memo will prevent re-rendering.
+```

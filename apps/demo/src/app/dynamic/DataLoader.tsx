@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { peekaboo } from './_data/const';
 import { PeekabooObjSourceData } from 'peekaboo-store';
 import { updatePeekaboo } from 'peekaboo-store/utils/update';
@@ -29,7 +29,8 @@ const mockDataAfterTimeout: Partial<PeekabooObjSourceData<typeof peekaboo>> = {
 };
 
 const DataLoader = ({ dataDirect }: { dataDirect: object }) => {
-	updatePeekaboo(peekaboo, dataDirect);
+	updatePeekaboo(peekaboo, dataDirect); // server side data update!
+	// make sure this component does not re-render!
 	useEffect(() => {
 		setTimeout(() => {
 			updatePeekaboo(peekaboo, mockDataAfterTimeout);
@@ -38,4 +39,4 @@ const DataLoader = ({ dataDirect }: { dataDirect: object }) => {
 	return null;
 };
 
-export default DataLoader;
+export default React.memo(DataLoader);
