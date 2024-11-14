@@ -3,6 +3,7 @@ import UpdatedServerSide from './UpdatedServerSide';
 
 import UsageAccessor from '../UsageAccessor';
 import TriggerFromServerSide from './TriggerFromServerSide';
+import CrazyTest from './CrazyTest';
 
 const titles = ['title1', 'title2'];
 const subTitles = ['subTitle1', 'subTitle2'];
@@ -20,6 +21,7 @@ export default function Page() {
 	}, []);
 	return (
 		<div>
+			<CrazyTest />
 			<UsageAccessor />
 			<TriggerFromServerSide arr={['routes', 'page2', 'header', 'title']} options={titles} />
 			<TriggerFromServerSide arr={['routes', 'page2', 'header', 'subTitle']} options={subTitles} />

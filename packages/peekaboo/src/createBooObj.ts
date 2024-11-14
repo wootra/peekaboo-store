@@ -27,11 +27,11 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
 
 	const dataObj = _getObjByKey(__store, __layerKeys);
-	// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+	const initDataObj = _getObjByKey(__store.initData, __layerKeys);
 	const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 
 	const init = () => {
-		const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
 		return stripPeeka(initDataObj[booKey]) as T;
 	};
 	// core algorithm:
@@ -48,9 +48,9 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	// - update snapshot to match with value
 	const set = (newValue: T | PartialType<T>) => {
 		const idSet = new Set<string>();
-		const initDataObj = _getObjByKey(__store.initData, __layerKeys);
-		const dataObj = _getObjByKey(__store, __layerKeys);
-		const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
+		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+		// const dataObj = _getObjByKey(__store, __layerKeys);
+		// const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 		const onChanged = (arr: string[]) => {
 			idSet.add(createBooUidFromLayer(__store, arr));
 		};
@@ -79,7 +79,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 		const initValue = init();
 		const newValToSet = newVal ?? (initValue as PartialType<T>);
 
-		const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
+		// const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
 
 		reinitialize(__store, initDataObj, newVal, booKey, __layerKeys);
 		set(newValToSet);
@@ -108,7 +108,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const get = () => {
 		usageInfo.isUsed = true;
 		usageInfo.isEverUsed = true;
-		const dataObj = _getObjByKey(__store, __layerKeys);
+		// const dataObj = _getObjByKey(__store, __layerKeys);
 		return dataObj[booKey] as T;
 	};
 
