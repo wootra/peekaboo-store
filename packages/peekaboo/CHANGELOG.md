@@ -1,7 +1,7 @@
 # Change Logs
 
 ## 1.7.4
-update: server-side sample.
+update: server-side sample, README update (no lib code change)
 
 ## 1.7.3
 fix: change behavior for null or undefined type for initData. it will allow update regardless of type.
