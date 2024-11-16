@@ -10,7 +10,6 @@ export const addBooEvent = <T>(boo: BooType<T>, setState: (_val: T) => void) => 
 	const listener: EventListenerOrEventListenerObject = e => {
 		const ev = e as CustomEvent<UpdateDetail>;
 
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- store can be empty
 		const storeMatch = boo.__booType === 'derived' ? true : ev.detail.storeId === boo.__store?.storeId;
 
 		const shouldUpdate = ev.type === UPDATE_VALUE && ev.detail.idSet?.has(boo.__booUId) && storeMatch;

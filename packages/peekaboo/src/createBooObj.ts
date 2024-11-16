@@ -18,7 +18,7 @@ type BooInfo =
 			unsub: () => void;
 	  };
 
-const createBooObj = <T>(__store?: Store, booInfo: BooInfo = {} as BooInfo) => {
+const createBooObj = <T>(__store: Store | undefined, booInfo: BooInfo) => {
 	const { booType: __booType, parentKeys: __layerKeys = [], parentBoo = null, booKey } = booInfo;
 
 	const __parentBoo = parentBoo; // only for valid branch. should not
@@ -40,7 +40,7 @@ const createBooObj = <T>(__store?: Store, booInfo: BooInfo = {} as BooInfo) => {
 	const init = () => {
 		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
 		if (typeof initDataObj === 'object') {
-			return stripPeeka((initDataObj as Record<string, any>)?.[booKey]) as T;
+			return stripPeeka(initDataObj[booKey]) as T;
 		}
 	};
 	// core algorithm:

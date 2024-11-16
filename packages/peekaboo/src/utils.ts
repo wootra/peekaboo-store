@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- validation code. */
 import type { BooType } from './types';
 
 export const validateBoo = (boo: BooType<any>) => {

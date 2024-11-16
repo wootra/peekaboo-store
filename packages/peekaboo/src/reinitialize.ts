@@ -20,7 +20,6 @@ const reinitialize = (props: {
 
 	const booUid = createBooUidFromLayer(store, [...parentKeysStacks, keyToUpdate]);
 	const boo = store.booMap[booUid];
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- validation code
 	if (!boo) {
 		console.error('boo is not found for ' + booUid, 'from', Object.keys(store.booMap));
 		throw new Error(`boo not found in ${booUid}`);

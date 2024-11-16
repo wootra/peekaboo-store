@@ -20,6 +20,7 @@ export default [
 			'@typescript-eslint/array-type': 'off',
 			'@typescript-eslint/naming-convention': 'off',
 			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unnecessary-condition': 'off',
 		},
 		languageOptions: {
 			...love.languageOptions,

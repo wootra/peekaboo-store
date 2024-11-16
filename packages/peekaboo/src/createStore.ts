@@ -15,7 +15,6 @@ const fillAllDerivedBooIds = (booMap: Store['booMap'], idSet: Set<string>) => {
 	const allIds = new Set<string>([...idSet]);
 	for (const id of idSet) {
 		const boo = booMap[id];
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- validation
 		if (!boo) {
 			console.error('boo for ' + id + ' is not found in booMap', booMap);
 			continue;

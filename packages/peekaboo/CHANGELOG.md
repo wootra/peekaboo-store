@@ -2,7 +2,10 @@
 
 ## 1.8.0
 add derivedBoo
+add transformer
 fix: render conflict issue(cannot render while the other component is rendering)
+add derivedBoo demo
+add transformer, derivedBoo unit tests 
 
 ## 1.7.4
 update: server-side sample, README update (no lib code change)

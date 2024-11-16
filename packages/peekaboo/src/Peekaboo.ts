@@ -8,7 +8,6 @@ function createPeekaboo<U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	initData: U,
 	options?: PeekabooOptions
 ): PeekabooObj<U> {
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- validation code
 	if (!initData || typeof initData !== 'object' || Object.keys(initData).length === 0) {
 		throw new Error('Peekaboo initData must be an object, and not empty');
 	}
