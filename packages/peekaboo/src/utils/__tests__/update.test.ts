@@ -11,6 +11,7 @@ const defaultVal = {
 
 describe('update', () => {
 	describe('updatePeekaboo', () => {
+		// eslint-disable-next-line @typescript-eslint/init-declarations -- ignore
 		let testStore: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
 		beforeEach(() => {
 			testStore = createPeekaboo(defaultVal);
@@ -38,12 +39,18 @@ describe('update', () => {
 
 		it('should throw exception when not object added', () => {
 			const errMsg = 'Peekaboo initData must be an object';
-			// @ts-ignore
-			expect(() => updatePeekaboo(testStore, 1)).toThrow(errMsg);
-			// @ts-ignore
-			expect(() => updatePeekaboo(testStore, 'test')).toThrow(errMsg);
-			// @ts-ignore
-			expect(() => updatePeekaboo(testStore, true)).toThrow(errMsg);
+			expect(() => {
+				// @ts-ignore -- ignore for test
+				updatePeekaboo(testStore, 1);
+			}).toThrow(errMsg);
+			expect(() => {
+				// @ts-ignore
+				updatePeekaboo(testStore, 'test');
+			}).toThrow(errMsg);
+			expect(() => {
+				// @ts-ignore
+				updatePeekaboo(testStore, true);
+			}).toThrow(errMsg);
 		});
 	});
 
@@ -56,6 +63,8 @@ describe('update', () => {
 				test32: null,
 			},
 		};
+
+		// eslint-disable-next-line @typescript-eslint/init-declarations -- ignore
 		let testStore: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
 		beforeEach(() => {
 			testStore = createPeekaboo(defaultVal);

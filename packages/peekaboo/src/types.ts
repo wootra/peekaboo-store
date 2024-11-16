@@ -35,7 +35,8 @@ type BooType<T> = Readonly<{
 	__initialize: (_newVal?: T | PartialType<T>) => void;
 	__resetUsage: () => void;
 	reset: () => void;
-	isDerived: () => boolean;
+	isTransformed: () => boolean;
+	transform: (_func: ((_orgValue: T) => T) | null) => void;
 	get: () => T;
 	set: Setter<T>;
 	__layerKeys: string[];
@@ -45,7 +46,6 @@ type BooType<T> = Readonly<{
 	__allUsed: () => boolean;
 	__allEverUsed: () => boolean;
 	__waterFallRefs: Set<BooType<any>>;
-	__appendWaterFallSet: (_boo: BooType<any>) => void;
 }>;
 
 type UpdateDetail = Readonly<{
@@ -96,7 +96,7 @@ type PartialOrgTypes<K> = {
 type PeekabooObjSourceData<U> = U extends PeekabooObj<infer T> ? OrgTypes<T> : U;
 type PeekabooObjPartialSourceData<U> = U extends PeekabooObj<infer T> ? PartialOrgTypes<T> : U;
 
-type BooNodeType = 'leaf' | 'branch';
+type BooNodeType = 'leaf' | 'branch' | 'derived';
 
 type PeekabooOptions = {
 	/**

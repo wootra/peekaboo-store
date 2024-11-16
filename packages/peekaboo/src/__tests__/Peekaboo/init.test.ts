@@ -5,6 +5,8 @@ describe('Peekaboo', () => {
 	describe('init', () => {
 		const peekaObj = { a: 1 };
 		const defaultVal = { key1: 'value', key2: 123, key3: true, peeka: peeka(peekaObj) };
+
+		// eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in beforeEach
 		let store: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
 		beforeEach(() => {
 			store = createPeekaboo(defaultVal);

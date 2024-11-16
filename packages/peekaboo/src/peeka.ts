@@ -1,4 +1,4 @@
-import { PeekaType } from './types';
+import type { PeekaType } from './types';
 
 /**
  * create a peeka object.
@@ -44,9 +44,11 @@ const isPeekaLayer = (obj: any, keys: string[], index?: number) => {
 	};
 	for (let i = 0; i < indexToSearch; i++) {
 		throwErrorIfNotValid(objToSearch, keys[i]);
+
 		objToSearch = objToSearch[keys[i]];
 	}
 	throwErrorIfNotValid(objToSearch, keys[indexToSearch]);
+
 	return isPeekaType(objToSearch[keys[indexToSearch]]);
 };
 export { peeka, isPeekaType, isPeekaLayer };

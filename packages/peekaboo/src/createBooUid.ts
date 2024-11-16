@@ -1,4 +1,4 @@
-import { Store } from './types';
+import type { Store } from './types';
 
 export const createBooUid = (store: Store, booId: string) => `${store.storeId}-${booId}`;
 

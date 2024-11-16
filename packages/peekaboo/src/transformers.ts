@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return -- transformer logic */
 import { isDataTypeSame } from './isDataTypeSame';
 import { isPeekaType } from './peeka';
-import { OrgTypes, PeekaType } from './types';
+import type { OrgTypes, PeekaType } from './types';
 
 function cloneInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest: any = {}): T {
 	for (const key in initData) {
@@ -14,15 +15,15 @@ function cloneInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest
 				continue;
 			} else {
 				if (!dest[key]) {
-					dest[key] = {} as T[keyof T];
+					dest[key] = {};
 				}
-				dest[key] = cloneInitData(initData[key as keyof T] as T[keyof T], dest[key]);
+				dest[key] = cloneInitData(initData[key as keyof T], dest[key]);
 			}
 		} else {
 			dest[key] = initData[key];
 		}
 	}
-	return dest;
+	return dest as T;
 }
 
 function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, dest: any = {}): OrgTypes<T> {
@@ -36,15 +37,15 @@ function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, d
 				dest[key] = initData[key]; // array should be as it is.
 			} else {
 				if (!dest[key]) {
-					dest[key] = {} as T[keyof T];
+					dest[key] = {};
 				}
-				dest[key] = sanitizeInitData(initData[key as keyof T] as T[keyof T], dest[key]);
+				dest[key] = sanitizeInitData(initData[key as keyof T], dest[key]);
 			}
 		} else {
 			dest[key] = initData[key];
 		}
 	}
-	return dest;
+	return dest as OrgTypes<T>;
 }
 
 /**
@@ -54,25 +55,24 @@ function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, d
 const stripPeeka = (value: any) => {
 	if (isPeekaType(value)) return (value as PeekaType<unknown>).init;
 	if (value && typeof value === 'object' && !Array.isArray(value)) {
-		return Object.keys(value).reduce(
-			(acc, key) => {
-				acc[key] = stripPeeka(value[key]);
-				return acc;
-			},
-			{} as Record<string, any>
-		);
+		return Object.keys(value).reduce<Record<string, any>>((acc, key) => {
+			acc[key] = stripPeeka(value[key]);
+			return acc;
+		}, {});
 	}
 	return value;
 };
 
-const syncAndCollectChanged = (
-	initData: Record<string, any>,
-	updatedObj: Record<string, any>,
-	objToSync: Record<string, any>,
-	keyToUpdate: string,
-	onChanged: (_keyStack: string[], _updatedValue: any) => void,
-	parentKeysStacks: string[] = []
-): boolean => {
+const syncAndCollectChanged = (props: {
+	initData: Record<string, any>;
+	updatedObj: Record<string, any>;
+	objToSync: Record<string, any>;
+	keyToUpdate: string;
+	onChanged: (_keyStack: string[], _updatedValue: any) => void;
+	parentKeysStacks?: string[];
+}): boolean => {
+	const { initData, updatedObj, objToSync, keyToUpdate, onChanged, parentKeysStacks = [] } = props;
+
 	if (updatedObj[keyToUpdate] === undefined) return false;
 
 	const call = () => {
@@ -114,14 +114,14 @@ const syncAndCollectChanged = (
 		let isChanged = false;
 		for (const key in initData[keyToUpdate]) {
 			if (
-				syncAndCollectChanged(
-					initData[keyToUpdate],
-					updatedObj[keyToUpdate],
-					objToSync[keyToUpdate],
-					key,
+				syncAndCollectChanged({
+					initData: initData[keyToUpdate],
+					updatedObj: updatedObj[keyToUpdate],
+					objToSync: objToSync[keyToUpdate],
+					keyToUpdate: key,
 					onChanged,
-					[...parentKeysStacks, keyToUpdate]
-				)
+					parentKeysStacks: [...parentKeysStacks, keyToUpdate],
+				})
 			) {
 				isChanged = true;
 			}
@@ -149,30 +149,26 @@ const replaceDataIfTypeSame = (
 	target[key] = value;
 };
 
-const updateValuesInObjByKey = (
-	initData: Record<string, unknown>, // structure to keep. should check peeka type from here.
-	updatedObj: Record<string, unknown>, // values to update. should have matching structure with objToSync
-	objToSync: Record<string, unknown>, // target object to update.
-	keyToUpdate: string, // target item to update.
-	parentKeysStacks: string[] = []
-) => {
+const updateValuesInObjByKey = (props: {
+	initData: Record<string, unknown>; // structure to keep. should check peeka type from here.
+	updatedObj: Record<string, unknown>; // values to update. should have matching structure with objToSync
+	objToSync: Record<string, unknown>; // target object to update.
+	keyToUpdate: string; // target item to update.
+	parentKeysStacks?: string[];
+}) => {
+	const { initData, updatedObj, objToSync, keyToUpdate, parentKeysStacks = [] } = props;
 	if (updatedObj[keyToUpdate] === undefined) return false;
 
 	if (
 		isPeekaType(initData[keyToUpdate]) ||
 		typeof initData[keyToUpdate] !== 'object' ||
-		initData[keyToUpdate] === null ||
-		initData[keyToUpdate] === undefined
+		initData[keyToUpdate] === null
 	) {
 		if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
 			replaceDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
 		}
 	} else {
-		if (
-			initData[keyToUpdate] &&
-			typeof initData[keyToUpdate] === 'object' &&
-			Array.isArray(initData[keyToUpdate])
-		) {
+		if (typeof initData[keyToUpdate] === 'object' && Array.isArray(initData[keyToUpdate])) {
 			if (objToSync[keyToUpdate] !== updatedObj[keyToUpdate]) {
 				replaceDataIfTypeSame(objToSync, keyToUpdate, updatedObj[keyToUpdate], parentKeysStacks);
 			}
@@ -180,31 +176,31 @@ const updateValuesInObjByKey = (
 		}
 
 		for (const key in initData[keyToUpdate]) {
-			updateValuesInObjByKey(
-				initData[keyToUpdate] as Record<string, unknown>,
-				updatedObj[keyToUpdate] as Record<string, unknown>,
-				objToSync[keyToUpdate] as Record<string, unknown>,
-				key,
-				[...parentKeysStacks, keyToUpdate]
-			);
+			updateValuesInObjByKey({
+				initData: initData[keyToUpdate] as Record<string, unknown>,
+				updatedObj: updatedObj[keyToUpdate] as Record<string, unknown>,
+				objToSync: objToSync[keyToUpdate] as Record<string, unknown>,
+				keyToUpdate: key,
+				parentKeysStacks: [...parentKeysStacks, keyToUpdate],
+			});
 		}
 	}
 };
 
 /**
- * tet object's value accessed by keys array.
+ * take object's value accessed by keys array.
  * if the node in the middle does not exist, return undefined.
  * do not assign index parameter manually. it is used for recursive call.
  */
-function _getObjByKey(obj: Record<string, any>, keysArr: string[]) {
+function _getObjByKey(obj: Record<string, any>, keysArr: string[] = []) {
 	if (keysArr.length === 0) return obj;
-	let currObj = obj;
+	let currObj: any = obj;
 
-	for (let i = 0; currObj && i < keysArr.length - 1; i++) {
+	for (let i = 0; typeof currObj === 'object' && i < keysArr.length - 1; i++) {
 		const currKey = keysArr[i];
-
 		currObj = currObj[currKey];
 	}
+
 	return currObj?.[keysArr[keysArr.length - 1]];
 }
 
@@ -237,15 +233,12 @@ function _setObjByKey(obj: Record<string, any>, value: any, keysArr: string[]) {
  * i.e. { 'key1.key2': 'value' } => { key1: { key2: 'value' } }
  */
 function _convertContentToObj(contentObj: Record<string, any>) {
-	return Object.keys(contentObj).reduce(
-		(acc, key) => {
-			const keysArr = key.split('.');
-			_setObjByKey(acc, contentObj[key], keysArr);
+	return Object.keys(contentObj).reduce<Record<string, any>>((acc, key) => {
+		const keysArr = key.split('.');
+		_setObjByKey(acc, contentObj[key], keysArr);
 
-			return acc;
-		},
-		{} as Record<string, any>
-	);
+		return acc;
+	}, {});
 }
 
 export {

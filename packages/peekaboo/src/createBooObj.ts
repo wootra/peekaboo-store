@@ -1,16 +1,25 @@
 import { createBooUid, createBooUidFromLayer } from './createBooUid';
 import { reinitialize } from './reinitialize';
 import { _getObjByKey, stripPeeka, syncAndCollectChanged, updateValuesInObjByKey } from './transformers';
-import { BooNodeType, BooType, PartialType, Store } from './types';
+import type { BooNodeType, BooType, PartialType, Store } from './types';
 
-type BooInfo = {
-	booType: BooNodeType;
-	parentKeys: string[];
-	parentBoo: BooType<any> | null;
-	booKey: string;
-};
+type BooInfo =
+	| {
+			booType: Exclude<BooNodeType, 'derived'>;
+			parentKeys: string[];
+			parentBoo: BooType<any> | null;
+			booKey: string;
+	  }
+	| {
+			booType: 'derived';
+			parentKeys?: string[];
+			parentBoo?: BooType<any> | null;
+			booKey: string;
+			unsub: () => void;
+	  };
+
 const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
-	const { booType: __booType, parentKeys: __layerKeys, parentBoo, booKey } = booInfo;
+	const { booType: __booType, parentKeys: __layerKeys = [], parentBoo = null, booKey } = booInfo;
 
 	const __parentBoo = parentBoo; // only for valid branch. should not
 	const __booId = __parentBoo?.__booId ? `${__parentBoo.__booId}.${booKey}` : booKey;
@@ -21,9 +30,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	};
 
 	const __waterFallRefs = new Set<BooType<any>>();
-	const __appendWaterFallSet = (boo: BooType<any>) => {
-		__waterFallRefs.add(boo);
-	};
+
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
 
 	const dataObj = _getObjByKey(__store, __layerKeys);
@@ -32,6 +39,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 
 	const init = () => {
 		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
+
 		return stripPeeka(initDataObj[booKey]) as T;
 	};
 	// core algorithm:
@@ -55,8 +63,19 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 			idSet.add(createBooUidFromLayer(__store, arr));
 		};
 
-		updateValuesInObjByKey(initDataObj, { [booKey]: newValue }, dataObj, booKey);
-		const isChanged = syncAndCollectChanged(initDataObj, dataObj, snapshotObj, booKey, onChanged);
+		updateValuesInObjByKey({
+			initData: initDataObj,
+			updatedObj: { [booKey]: newValue },
+			objToSync: dataObj,
+			keyToUpdate: booKey,
+		});
+		const isChanged = syncAndCollectChanged({
+			initData: initDataObj,
+			updatedObj: dataObj,
+			objToSync: snapshotObj,
+			keyToUpdate: booKey,
+			onChanged,
+		});
 		if (isChanged) {
 			// when found some value is changed in the below level,
 			// all parent should be updated in case there are parent boo is used in the hook.
@@ -81,7 +100,13 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 
 		// const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
 
-		reinitialize(__store, initDataObj, newVal, booKey, __layerKeys);
+		reinitialize({
+			store: __store,
+			initData: initDataObj,
+			updatedObj: newVal,
+			keyToUpdate: booKey,
+			parentKeysStacks: __layerKeys,
+		});
 		set(newValToSet);
 	};
 
@@ -108,8 +133,15 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const get = () => {
 		usageInfo.isUsed = true;
 		usageInfo.isEverUsed = true;
+		if (__transformer.func) {
+			return __transformer.func(dataObj[booKey] as T);
+		}
 		// const dataObj = _getObjByKey(__store, __layerKeys);
 		return dataObj[booKey] as T;
+	};
+
+	const transform = (func: ((_val: T) => T) | null) => {
+		__transformer.func = func;
 	};
 
 	const boo: BooType<T> = {
@@ -128,8 +160,8 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 		__allEverUsed,
 		__initialize,
 		__waterFallRefs,
-		__appendWaterFallSet,
-		isDerived: () => __transformer.func !== null,
+		transform,
+		isTransformed: () => __transformer.func !== null,
 		get,
 		set,
 	} as const;

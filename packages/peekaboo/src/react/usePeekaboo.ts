@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BooType, UpdateDetail } from '../types';
+import type { BooType, UpdateDetail } from '../types';
 import { UPDATE_VALUE } from '../consts';
 import { validateBoo } from '../utils';
 
 export const usePeekaboo = <T>(boo: BooType<T>) => {
 	validateBoo(boo);
-	const [state, setState] = useState(() => boo.get() ?? (boo.init() as T));
+	const [state, setState] = useState(() => boo.get() ?? boo.init());
 
 	useEffect(() => {
 		const listener: EventListenerOrEventListenerObject = e => {
@@ -18,7 +18,7 @@ export const usePeekaboo = <T>(boo: BooType<T>) => {
 				ev.detail.storeId === boo.__store.storeId;
 
 			if (shouldUpdate) {
-				const updated = boo.get() as T;
+				const updated = boo.get();
 				if (boo.__booType === 'branch') {
 					setState({ ...updated });
 				} else {

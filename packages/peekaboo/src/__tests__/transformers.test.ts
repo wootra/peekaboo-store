@@ -93,6 +93,8 @@ describe('transformers', () => {
 		const peekaArr = peeka([1, 2, 3]);
 		const arr = [1, 2, 3];
 		const initData = { route: { a: 1, b: 2, arr, c: { d: 'a', e: true, parr: peekaArr }, p: peekaObj } };
+
+		// eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in beforeEach
 		let orgSnapshot: any;
 		beforeEach(() => {
 			orgSnapshot = {
@@ -105,7 +107,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set(['route', 'route.a', 'route.b', 'route.c', 'route.c.d']));
 			expect(ret).toBeTruthy();
 		});
@@ -117,7 +126,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set(['route', 'route.p']));
 			expect(ret).toBeTruthy();
 		});
@@ -134,7 +150,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set(['route', 'route.arr']));
 			expect(ret).toBeTruthy();
 		});
@@ -145,7 +168,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set(['route', 'route.c', 'route.c.parr']));
 			expect(ret).toBeTruthy();
 		});
@@ -156,7 +186,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set(['route', 'route.c', 'route.c.d']));
 			expect(ret).toBeTruthy();
 		});
@@ -167,7 +204,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set([]));
 			expect(ret).toBeFalsy();
 		});
@@ -178,7 +222,14 @@ describe('transformers', () => {
 			};
 			const changedSet = new Set();
 			const onChanged = (keyStack: string[]) => changedSet.add(keyStack.join('.'));
-			const ret = syncAndCollectChanged(initData, changed, orgSnapshot, 'route', onChanged, []);
+			const ret = syncAndCollectChanged({
+				initData,
+				updatedObj: changed,
+				objToSync: orgSnapshot,
+				keyToUpdate: 'route',
+				onChanged,
+				parentKeysStacks: [],
+			});
 			expect(changedSet).toStrictEqual(new Set([]));
 			expect(ret).toBeFalsy();
 		});
@@ -191,6 +242,8 @@ describe('transformers', () => {
 		const initData = {
 			route: { a: 91, b: 92, arr, c: { d: '9a', e: true, parr: peekaArr }, p: peekaObj },
 		};
+
+		// eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in beforeEach
 		let dstData: any;
 		beforeEach(() => {
 			dstData = {
@@ -198,7 +251,12 @@ describe('transformers', () => {
 			};
 		});
 		it('should update value only changed', () => {
-			updateValuesInObjByKey(initData, { route: { a: 11, c: { d: '9b' } } }, dstData, 'route');
+			updateValuesInObjByKey({
+				initData,
+				updatedObj: { route: { a: 11, c: { d: '9b' } } },
+				objToSync: dstData,
+				keyToUpdate: 'route',
+			});
 			expect(dstData).toStrictEqual({
 				route: { a: 11, b: 92, arr, c: { d: '9b', e: true, parr: peekaArr.init }, p: peekaObj.init },
 			});

@@ -1,6 +1,6 @@
 import { UPDATE_VALUE } from './consts';
 import { cloneInitData, sanitizeInitData } from './transformers';
-import { PeekabooOptions, Store, UpdateDetail } from './types';
+import type { PeekabooOptions, Store, UpdateDetail } from './types';
 
 let storeIdNumBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
@@ -16,18 +16,18 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	const data = sanitizeInitData(initData);
 	let timerId = -1;
 
-	let idSetsToUpdate: Set<string>[] = [];
+	const idSetsToUpdate: Set<string>[] = [];
 	const updateNow = () => {
 		if (idSetsToUpdate.length > 0) {
 			if (typeof window !== 'undefined') {
 				const firstSet = idSetsToUpdate.shift();
 				window.dispatchEvent(
-					new CustomEvent(UPDATE_VALUE, {
+					new CustomEvent<UpdateDetail>(UPDATE_VALUE, {
 						detail: {
 							idSet: firstSet,
 							storeId,
-							forceRender: true, // __booType === 'branch',
-						} as UpdateDetail,
+							forceRender: true,
+						},
 					})
 				);
 			}

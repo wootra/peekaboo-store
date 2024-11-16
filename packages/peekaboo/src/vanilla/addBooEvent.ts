@@ -1,6 +1,6 @@
 'use client';
 
-import { BooType, UpdateDetail } from '../types';
+import type { BooType, UpdateDetail } from '../types';
 import { UPDATE_VALUE } from '../consts';
 import { validateBoo } from '../utils';
 
@@ -11,12 +11,10 @@ export const addBooEvent = <T>(boo: BooType<T>, setState: (_val: T) => void) => 
 		const ev = e as CustomEvent<UpdateDetail>;
 
 		const shouldUpdate =
-			ev.type === UPDATE_VALUE &&
-			ev.detail.idSet?.has(boo?.__booUId) &&
-			ev.detail.storeId === boo?.__store.storeId;
+			ev.type === UPDATE_VALUE && ev.detail.idSet?.has(boo.__booUId) && ev.detail.storeId === boo.__store.storeId;
 
 		if (shouldUpdate) {
-			const updated = boo.get() as T;
+			const updated = boo.get();
 			if (state !== updated) {
 				state = updated;
 				setState(updated);

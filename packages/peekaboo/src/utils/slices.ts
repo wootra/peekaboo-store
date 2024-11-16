@@ -1,4 +1,4 @@
-import { PeekabooObj } from '../types';
+import type { PeekabooObj } from '../types';
 
 /**
  * @deprecated in favor of just using partial object.
@@ -6,13 +6,11 @@ import { PeekabooObj } from '../types';
  * const partial = peekaboo.data.routes.page1.header;
  * usePeekaboo(partial.title._boo);
  */
-function createSlice<U extends { [Key in keyof U & `_${string}`]: U[Key] }, T extends unknown>(
+function createSlice<U extends { [Key in keyof U & `_${string}`]: U[Key] }, T>(
 	peekaboo: PeekabooObj<U>,
 	sliceFunc: (_peekabooData: PeekabooObj<U>['data']) => T
 ) {
-	return () => {
-		return sliceFunc(peekaboo.data) as T;
-	};
+	return () => sliceFunc(peekaboo.data);
 }
 
 export { createSlice };

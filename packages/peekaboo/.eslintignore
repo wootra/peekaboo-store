@@ -1,5 +1,0 @@
-tsup.config.ts
-jest.config.ts
-*.test.ts
-vitest.config.ts
-tagging.js

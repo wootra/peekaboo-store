@@ -16,7 +16,7 @@ const isDataTypeSame = (dst: any, cmp: any, logKeyLevel: string[] = []) => {
 		}
 		const keysB = Object.keys(cmp as object);
 		const keysA = new Set(Object.keys(dst as object));
-		for (let keyInB of keysB) {
+		for (const keyInB of keysB) {
 			if (!keysA.has(keyInB)) continue; // partial object
 			if (!isDataTypeSame(dst[keyInB], cmp[keyInB], [...logKeyLevel, keyInB])) {
 				return false;

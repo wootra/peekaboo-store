@@ -2,15 +2,16 @@ import { createBooUidFromLayer } from './createBooUid';
 import { isDataTypeSame } from './isDataTypeSame';
 import { isPeekaType } from './peeka';
 import { replaceDataIfTypeSame } from './transformers';
-import { PeekaType, Store } from './types';
+import type { PeekaType, Store } from './types';
 
-const reinitialize = (
-	store: Store,
-	initData: Record<string, any>,
-	updatedObj: any,
-	keyToUpdate: string,
-	parentKeysStacks: string[]
-) => {
+const reinitialize = (props: {
+	store: Store;
+	initData: Record<string, any>;
+	updatedObj: any;
+	keyToUpdate: string;
+	parentKeysStacks: string[];
+}) => {
+	const { store, initData, updatedObj, keyToUpdate, parentKeysStacks } = props;
 	if (updatedObj === undefined) return;
 
 	if (typeof initData !== 'object') {
@@ -19,6 +20,7 @@ const reinitialize = (
 
 	const booUid = createBooUidFromLayer(store, [...parentKeysStacks, keyToUpdate]);
 	const boo = store.booMap[booUid];
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- validation code
 	if (!boo) {
 		console.error('boo is not found for ' + booUid, 'from', Object.keys(store.booMap));
 		throw new Error(`boo not found in ${booUid}`);
@@ -43,7 +45,13 @@ const reinitialize = (
 			return;
 		}
 		for (const key in initData[keyToUpdate]) {
-			reinitialize(store, initData[keyToUpdate], updatedObj[key], key, [...parentKeysStacks, keyToUpdate]);
+			reinitialize({
+				store,
+				initData: initData[keyToUpdate],
+				updatedObj: updatedObj[key],
+				keyToUpdate: key,
+				parentKeysStacks: [...parentKeysStacks, keyToUpdate],
+			});
 		}
 	}
 };

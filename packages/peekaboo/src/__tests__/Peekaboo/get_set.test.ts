@@ -5,6 +5,8 @@ describe('Peekaboo', () => {
 	describe('set/get', () => {
 		describe('single layer', () => {
 			const defaultVal = { key1: 'value', key2: 123, key3: true };
+
+			// eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in beforeEach
 			let store: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
 			beforeEach(() => {
 				store = createPeekaboo(defaultVal);
@@ -23,6 +25,8 @@ describe('Peekaboo', () => {
 
 		describe('negative values', () => {
 			const defaultVal = { key1: null, key2: 0, key3: undefined };
+
+			// eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in beforeEach
 			let store: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
 			beforeEach(() => {
 				store = createPeekaboo(defaultVal);
@@ -88,6 +92,8 @@ describe('Peekaboo', () => {
 					twoLayer: { key1: 'value', key2: 123, key3: true },
 				},
 			};
+
+			// eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in beforeEach
 			let store: ReturnType<typeof createPeekaboo<typeof defaultVal>>;
 			beforeEach(() => {
 				store = createPeekaboo(defaultVal);

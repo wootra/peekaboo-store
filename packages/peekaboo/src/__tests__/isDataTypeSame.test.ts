@@ -41,7 +41,7 @@ describe('isDataTypeSame', () => {
 			},
 			key2: 999,
 		};
-		expect(isDataTypeSame(src, src)).toBe(true);
+		expect(isDataTypeSame(src, cmp)).toBe(true);
 	});
 
 	it('should return false if some item in the object does not match', () => {

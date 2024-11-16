@@ -1,8 +1,8 @@
 import { getContentAsObject } from 'src/utils/content';
-import { OrgTypes, PeekabooObj } from '../types';
+import type { OrgTypes, PeekabooObj } from '../types';
 import * as z from 'zod';
-
-function _wrapObjects(src: Record<string, any> | string | number | boolean | unknown[]): z.ZodType {
+type WrappableTypes = Record<string, any> | string | number | boolean | unknown[];
+function _wrapObjects(src: WrappableTypes): z.ZodType {
 	switch (typeof src) {
 		case 'string':
 			return z.string().optional();
@@ -15,22 +15,19 @@ function _wrapObjects(src: Record<string, any> | string | number | boolean | unk
 				if (src.length === 0) {
 					return z.array(z.any()).optional().optional();
 				} else {
-					const firstType = _wrapObjects(src[0]);
+					const firstType = _wrapObjects(src[0] as WrappableTypes);
 					return z.array(firstType).optional();
 				}
 			} else {
-				const obj = Object.keys(src).reduce(
-					(acc, key) => {
-						acc[key] = _wrapObjects(src[key]);
-						return acc;
-					},
-					{} as Record<string, any>
-				);
+				const obj = Object.keys(src).reduce<Record<string, any>>((acc, key) => {
+					acc[key] = _wrapObjects(src[key] as WrappableTypes);
+					return acc;
+				}, {});
 
 				return z.object(obj).optional();
 			}
 		default:
-			console.error(`${src} is not registered type: ${typeof src}`);
+			console.error(`${src as string} is not registered type: ${typeof src}`);
 			return z.any().optional();
 	}
 }

@@ -1,4 +1,4 @@
-export * from './Peekaboo';
-export * from './types';
 import { peeka } from './peeka';
+export * from './Peekaboo';
+export type * from './types';
 export { peeka };
