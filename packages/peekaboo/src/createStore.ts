@@ -3,7 +3,21 @@ import { cloneInitData, sanitizeInitData } from './transformers';
 import type { PeekabooOptions, Store, UpdateDetail } from './types';
 
 let storeIdNumBase = Math.round(Math.random() * (1000 - 1)) + 1000;
-
+const fillAllDerivedBooIds = (booMap: Store['booMap'], idSet: Set<string>) => {
+	const allIds = new Set<string>([...idSet]);
+	for (const id of idSet) {
+		const boo = booMap[id];
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- validation
+		if (!boo) {
+			console.error('boo for ' + id + ' is not found in booMap', booMap);
+			continue;
+		}
+		for (const derived of boo.__waterFallRefs) {
+			allIds.add(derived.__booUId);
+		}
+	}
+	return allIds;
+};
 const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	initData: U,
 	options?: PeekabooOptions
@@ -11,6 +25,7 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	const { staticId, eventOptimizeInMs = 100 } = options ?? {};
 	const storeIdBase = staticId ?? storeIdNumBase++;
 	const storeId = `peekabooStore-${storeIdBase}`;
+	const booMap = {} as unknown as Store['booMap'];
 	const cloned = cloneInitData(initData);
 	const snapshot = sanitizeInitData(initData);
 	const data = sanitizeInitData(initData);
@@ -20,11 +35,12 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	const updateNow = () => {
 		if (idSetsToUpdate.length > 0) {
 			if (typeof window !== 'undefined') {
-				const firstSet = idSetsToUpdate.shift();
+				const firstSet = idSetsToUpdate.shift()!;
+				const allIds = fillAllDerivedBooIds(booMap, firstSet);
 				window.dispatchEvent(
 					new CustomEvent<UpdateDetail>(UPDATE_VALUE, {
 						detail: {
-							idSet: firstSet,
+							idSet: allIds,
 							storeId,
 							forceRender: true,
 						},
@@ -54,7 +70,7 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	};
 	return {
 		storeId,
-		booMap: {},
+		booMap,
 		snapshot: {
 			data: snapshot,
 		}, // used only for comparison

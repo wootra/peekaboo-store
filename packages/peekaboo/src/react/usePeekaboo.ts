@@ -7,8 +7,7 @@ import { validateBoo } from '../utils';
 
 export const usePeekaboo = <T>(boo: BooType<T>) => {
 	validateBoo(boo);
-	const [state, setState] = useState(() => boo.get() ?? boo.init());
-
+	const [state, setState] = useState(boo.get() ?? boo.init());
 	useEffect(() => {
 		const listener: EventListenerOrEventListenerObject = e => {
 			const ev = e as CustomEvent<UpdateDetail>;
@@ -18,12 +17,14 @@ export const usePeekaboo = <T>(boo: BooType<T>) => {
 				ev.detail.storeId === boo.__store.storeId;
 
 			if (shouldUpdate) {
-				const updated = boo.get();
-				if (boo.__booType === 'branch') {
-					setState({ ...updated });
-				} else {
-					setState(updated);
-				}
+				queueMicrotask(() => {
+					const updated = boo.get();
+					if (boo.__booType === 'branch') {
+						setState({ ...updated });
+					} else {
+						setState(updated);
+					}
+				});
 			}
 		};
 		if (typeof window !== 'undefined') {

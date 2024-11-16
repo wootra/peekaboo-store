@@ -60,7 +60,10 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 		// const dataObj = _getObjByKey(__store, __layerKeys);
 		// const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 		const onChanged = (arr: string[]) => {
-			idSet.add(createBooUidFromLayer(__store, arr));
+			const booIdToUpdate = createBooUidFromLayer(__store, arr);
+			if (__store.booMap[booIdToUpdate]) {
+				idSet.add(booIdToUpdate);
+			}
 		};
 
 		updateValuesInObjByKey({

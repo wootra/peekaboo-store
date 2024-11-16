@@ -1,7 +1,9 @@
 const isDataTypeSame = (dst: any, cmp: any, logKeyLevel: string[] = []) => {
 	if (dst === null || dst === undefined) return true;
 	if (typeof dst !== typeof cmp) {
-		console.warn(`[${logKeyLevel.join('.')}] type is different. dst: ${typeof dst}, cmp: ${typeof cmp}`);
+		console.warn(
+			`[${logKeyLevel.join('.')}] type is different. dst: ${typeof dst}(${dst}), cmp: ${typeof cmp}(${cmp})`
+		);
 		return false;
 	}
 

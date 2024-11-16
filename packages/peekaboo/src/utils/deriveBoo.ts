@@ -1,13 +1,12 @@
-import { createBooObj } from 'src/createBooObj';
-import { createBooUid } from 'src/createBooUid';
-import type { BooType, PeekabooObj } from 'src/types';
-type DeriveCallback = <K>(_boo: BooType<K>) => BooType<K>;
+import { createBooObj } from '../createBooObj';
+import { createBooUid } from '../createBooUid';
+import type { BooType, PeekabooObj } from '../types';
 
 let deriveBooIdBase = 0;
 
 function deriveBoo<T, NEW_RESULT>(
 	peekaboo: PeekabooObj<T>,
-	deriveLogic: (_derive: DeriveCallback) => NEW_RESULT
+	deriveLogic: (_derive: <K>(_boo: BooType<K>) => K) => NEW_RESULT
 ): BooType<NEW_RESULT> {
 	const booCount = ++deriveBooIdBase;
 	const booId = `deriveBoo-${booCount}`;
@@ -25,13 +24,13 @@ function deriveBoo<T, NEW_RESULT>(
 		unsub,
 	});
 
-	const deriveFunc: DeriveCallback = boo => {
+	const deriveFunc: <K>(_boo: BooType<K>) => K = boo => {
 		derivedBooRef.curr && boo.__waterFallRefs.add(derivedBooRef.curr);
-		return boo;
+		return boo.get();
 	};
 
 	deriveLogic(deriveFunc);
-	const actualVal: DeriveCallback = v => v; // it does not do anything in real callback.
+	const actualVal: <K>(_boo: BooType<K>) => K = v => v.get(); // it does not do anything in real callback.
 
 	derivedBooRef.curr.transform(() => deriveLogic(actualVal));
 
