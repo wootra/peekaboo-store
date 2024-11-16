@@ -52,7 +52,7 @@ function sanitizeInitData<T extends { [Key in keyof T]: T[Key] }>(initData: T, d
  * return original data from PeekaType.
  * if it is not PeekaType, return as it is.
  */
-const stripPeeka = (value: any) => {
+const stripPeeka = (value?: any) => {
 	if (isPeekaType(value)) return (value as PeekaType<unknown>).init;
 	if (value && typeof value === 'object' && !Array.isArray(value)) {
 		return Object.keys(value).reduce<Record<string, any>>((acc, key) => {
@@ -192,7 +192,7 @@ const updateValuesInObjByKey = (props: {
  * if the node in the middle does not exist, return undefined.
  * do not assign index parameter manually. it is used for recursive call.
  */
-function _getObjByKey(obj: Record<string, any>, keysArr: string[] = []) {
+function _getObjByKey(obj: Record<string, any> | undefined, keysArr: string[] = []): Record<string, any> | undefined {
 	if (keysArr.length === 0) return obj;
 	let currObj: any = obj;
 

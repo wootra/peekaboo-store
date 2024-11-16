@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands -- for test */
 import { createPeekaboo } from 'src/Peekaboo';
 import { deriveBoo } from '../deriveBoo';
 import { peeka } from 'src/peeka';
@@ -26,7 +25,7 @@ describe('deriveBoo', () => {
 			const branch1 = peekaboo.data.key3;
 			const branch2 = peekaboo.data.key4;
 
-			const derivedBoo = deriveBoo(peekaboo, derive => {
+			const derivedBoo = deriveBoo(derive => {
 				const ret1 = derive(branch1._boo);
 				const ret2 = derive(branch2._boo);
 				return {
@@ -78,7 +77,7 @@ describe('deriveBoo', () => {
 			const leaf1 = peekaboo.data.key1;
 			const leaf2 = peekaboo.data.key2;
 
-			const derivedBoo = deriveBoo(peekaboo, derive => {
+			const derivedBoo = deriveBoo(derive => {
 				const ret1 = derive(leaf1._boo);
 				const ret2 = derive(leaf2._boo);
 				return {

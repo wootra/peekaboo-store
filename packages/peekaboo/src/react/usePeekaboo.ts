@@ -11,10 +11,12 @@ export const usePeekaboo = <T>(boo: BooType<T>) => {
 	useEffect(() => {
 		const listener: EventListenerOrEventListenerObject = e => {
 			const ev = e as CustomEvent<UpdateDetail>;
-			const shouldUpdate =
-				ev.type === UPDATE_VALUE &&
-				ev.detail.idSet?.has(boo.__booUId) &&
-				ev.detail.storeId === boo.__store.storeId;
+
+			// derived type does not need to match with storeId
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- store can be empty
+			const storeMatch = boo.__booType === 'derived' ? true : ev.detail.storeId === boo.__store?.storeId;
+
+			const shouldUpdate = ev.type === UPDATE_VALUE && ev.detail.idSet?.has(boo.__booUId) && storeMatch;
 
 			if (shouldUpdate) {
 				queueMicrotask(() => {

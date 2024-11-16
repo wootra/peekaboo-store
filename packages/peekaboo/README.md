@@ -383,3 +383,60 @@ const DataLoader = ({ dataDirect }: { dataDirect: object }) => {
 
 export default React.memo(DataLoader); // React.memo will prevent re-rendering.
 ```
+
+## DerivedBoo!
+
+Did you use jotai? derived atom is a useful feature that can transform original data into different format automatically. The calculation is happened before rendering, so it can save a lot of resource since it does not require rendering in the middle of transforming process.
+`peekaboo-store` is motivated by jotai's derived atom. But a lot more freedom!
+[DemoCode](https://github.com/wootra/peekaboo-store/blob/main/apps/demo/src/app/dynamic/derived/page.tsx)
+
+```typescript
+import {deriveBoo} from 'peekaboo-store/utils/deriveBoo';
+
+const peekaboo1 = createPeekaboo(initValue);
+const peekaboo2 = createPeekaboo(initValue2);
+
+const booFromPeekaboo1 = peekaboo1.data.key1._boo;
+const booFromPeekaboo2 = peekaboo2.data.key1._boo;
+
+const derived = deriveBoo((get)=>{
+	const val1 = get(booFromPeekaboo1);
+	const val2 = get(booFromPeekaboo2);
+});
+...
+const TempComp = ()=>{
+	const derivedVal = usePeekaboo(derived);
+	...
+}
+```
+
+Derived boo is working like the other boos. It is just an option for the convenience, and please use it only when it is necessary `Under` the limited boundary.
+Not because the derived boo has limitation, but because the concept of `peekaboo-store` is for easier organizing data structure.
+
+
+## Transformer
+
+Let's think about the situation you need some specific formatter. If we use derivedBoo, yes, we can do it.
+But I don't want to create a new instance, and want transform only for the specific return data.
+We can call `transform` function to manage its return value easily.
+
+```typescript
+const peekaboo = createPeekaboo({key1: {key2: 'value', key3: }});
+const valueBooKey2 = peekaboo.data.key1.key2._boo;
+console.log(valueBooKey2.get()); // ===> will print `value`
+valueBooKey1.transform(val=>val.toUpperCase());
+console.log(valueBooKey2.get()); // ===> will print `VALUE`
+console.log(peekaboo.data.key1._boo.get()); // will still print {key2: 'value', key3: }. 
+
+```
+
+this transform does not affect to the original data tree. So consider it as a inline derived Boo.
+But, the benefit of this is, this transform restrict the same type of the original data type.
+Which means, it will make your application safer.
+
+```typescript
+const peekaboo = createPeekaboo({key1: {key2: 'value', key3: }});
+const valueBooKey2 = peekaboo.data.key1.key2._boo;
+valueBooKey1.transform(val=>val.length()); // ==> will create a type error! (trying to convert string => number)
+```
+![type mismatch on transform](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/type-mismatch-on-transform.png?raw=true)

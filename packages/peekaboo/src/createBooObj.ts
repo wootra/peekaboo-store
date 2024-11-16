@@ -18,7 +18,7 @@ type BooInfo =
 			unsub: () => void;
 	  };
 
-const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
+const createBooObj = <T>(__store?: Store, booInfo: BooInfo = {} as BooInfo) => {
 	const { booType: __booType, parentKeys: __layerKeys = [], parentBoo = null, booKey } = booInfo;
 
 	const __parentBoo = parentBoo; // only for valid branch. should not
@@ -34,13 +34,14 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
 
 	const dataObj = _getObjByKey(__store, __layerKeys);
-	const initDataObj = _getObjByKey(__store.initData, __layerKeys);
-	const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
+	const initDataObj = _getObjByKey(__store?.initData, __layerKeys);
+	const snapshotObj = _getObjByKey(__store?.snapshot, __layerKeys);
 
 	const init = () => {
 		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
-
-		return stripPeeka(initDataObj[booKey]) as T;
+		if (typeof initDataObj === 'object') {
+			return stripPeeka((initDataObj as Record<string, any>)?.[booKey]) as T;
+		}
 	};
 	// core algorithm:
 	// save the value in the store both in the saved, and data at the same time.
@@ -61,10 +62,11 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 		// const snapshotObj = _getObjByKey(__store.snapshot, __layerKeys);
 		const onChanged = (arr: string[]) => {
 			const booIdToUpdate = createBooUidFromLayer(__store, arr);
-			if (__store.booMap[booIdToUpdate]) {
+			if (__store?.booMap[booIdToUpdate]) {
 				idSet.add(booIdToUpdate);
 			}
 		};
+		if (!initDataObj || !dataObj || !snapshotObj || !__store) return;
 
 		updateValuesInObjByKey({
 			initData: initDataObj,
@@ -100,7 +102,7 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const __initialize = (newVal?: T | PartialType<T>) => {
 		const initValue = init();
 		const newValToSet = newVal ?? (initValue as PartialType<T>);
-
+		if (!__store || !initDataObj) return;
 		// const initDataObj = _getObjByKey(__store.initData, [...__layerKeys]);
 
 		reinitialize({
@@ -136,11 +138,12 @@ const createBooObj = <T>(__store: Store, booInfo: BooInfo) => {
 	const get = () => {
 		usageInfo.isUsed = true;
 		usageInfo.isEverUsed = true;
+
 		if (__transformer.func) {
-			return __transformer.func(dataObj[booKey] as T);
+			return __transformer.func((dataObj as any)?.[booKey] as T);
 		}
 		// const dataObj = _getObjByKey(__store, __layerKeys);
-		return dataObj[booKey] as T;
+		return (dataObj as any)?.[booKey] as T;
 	};
 
 	const transform = (func: ((_val: T) => T) | null) => {

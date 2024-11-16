@@ -1,5 +1,6 @@
 import type { Store } from './types';
 
-export const createBooUid = (store: Store, booId: string) => `${store.storeId}-${booId}`;
+export const createBooUid = (store: Store | undefined, booId: string) => `${store?.storeId ?? 'no-store'}-${booId}`;
 
-export const createBooUidFromLayer = (store: Store, layer: string[]) => `${store.storeId}-${layer.join('.')}`;
+export const createBooUidFromLayer = (store: Store | undefined, layer: string[]) =>
+	`${store?.storeId ?? 'no-store'}-${layer.join('.')}`;

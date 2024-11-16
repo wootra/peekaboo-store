@@ -16,7 +16,7 @@ function peeka<T extends object>(value: T): PeekaType<T> {
 /**
  * check if the object is a peeka object.
  */
-const isPeekaType = (obj: unknown) => {
+const isPeekaType = (obj?: unknown) => {
 	return obj && typeof obj === 'object' && (obj as any).peekabooType === 'peeka';
 };
 

@@ -1,13 +1,10 @@
 import { createBooObj } from '../createBooObj';
 import { createBooUid } from '../createBooUid';
-import type { BooType, PeekabooObj } from '../types';
+import type { BooType } from '../types';
 
 let deriveBooIdBase = 0;
 
-function deriveBoo<T, NEW_RESULT>(
-	peekaboo: PeekabooObj<T>,
-	deriveLogic: (_derive: <K>(_boo: BooType<K>) => K) => NEW_RESULT
-): BooType<NEW_RESULT> {
+function deriveBoo<NEW_RESULT>(deriveLogic: (_derive: <K>(_boo: BooType<K>) => K) => NEW_RESULT): BooType<NEW_RESULT> {
 	const booCount = ++deriveBooIdBase;
 	const booId = `deriveBoo-${booCount}`;
 
@@ -18,8 +15,8 @@ function deriveBoo<T, NEW_RESULT>(
 			derivedBooRef.curr && dep.__waterFallRefs.delete(derivedBooRef.curr);
 		}
 	};
-	derivedBooRef.curr = createBooObj(peekaboo.store, {
-		booKey: createBooUid(peekaboo.store, booId),
+	derivedBooRef.curr = createBooObj(undefined, {
+		booKey: createBooUid(undefined, booId),
 		booType: 'derived',
 		unsub,
 	});

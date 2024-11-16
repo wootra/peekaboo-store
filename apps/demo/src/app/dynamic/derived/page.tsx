@@ -21,13 +21,19 @@ const titles: BooDataType<typeof page1HeaderSlice._boo>[] = [
 		title: 'title3',
 	},
 ];
-const derived = deriveBoo(peekaboo, get => {
+const derived = deriveBoo(get => {
 	return {
 		subtitle: get(page1HeaderSlice._boo).subTitle + '_derived',
 		title: get(page1HeaderSlice._boo).title + '_derived',
 	};
 });
-
+const derived2 = deriveBoo(get => {
+	const data = get(derived);
+	return {
+		subtitle: data.subtitle + '_again',
+		title: data.title + '_again',
+	};
+});
 export default function Page() {
 	return (
 		<div>
@@ -38,6 +44,7 @@ export default function Page() {
 			<Updated boo={page1HeaderSlice.title._boo} />
 			<Updated boo={page1HeaderSlice.subTitle._boo} />
 			<Updated boo={derived} />
+			<Updated boo={derived2} />
 		</div>
 	);
 }

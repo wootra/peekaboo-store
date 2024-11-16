@@ -1,8 +1,16 @@
 import { UPDATE_VALUE } from './consts';
 import { cloneInitData, sanitizeInitData } from './transformers';
-import type { PeekabooOptions, Store, UpdateDetail } from './types';
+import type { BooType, PeekabooOptions, Store, UpdateDetail } from './types';
 
 let storeIdNumBase = Math.round(Math.random() * (1000 - 1)) + 1000;
+
+const collectAllWaterfalls = (boo: BooType<unknown>, idSet: Set<string>) => {
+	for (const derived of boo.__waterFallRefs) {
+		idSet.add(derived.__booUId);
+		collectAllWaterfalls(derived, idSet);
+	}
+};
+
 const fillAllDerivedBooIds = (booMap: Store['booMap'], idSet: Set<string>) => {
 	const allIds = new Set<string>([...idSet]);
 	for (const id of idSet) {
@@ -12,12 +20,11 @@ const fillAllDerivedBooIds = (booMap: Store['booMap'], idSet: Set<string>) => {
 			console.error('boo for ' + id + ' is not found in booMap', booMap);
 			continue;
 		}
-		for (const derived of boo.__waterFallRefs) {
-			allIds.add(derived.__booUId);
-		}
+		collectAllWaterfalls(boo, allIds);
 	}
 	return allIds;
 };
+
 const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	initData: U,
 	options?: PeekabooOptions
@@ -35,7 +42,7 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	const updateNow = () => {
 		if (idSetsToUpdate.length > 0) {
 			if (typeof window !== 'undefined') {
-				const firstSet = idSetsToUpdate.shift()!;
+				const firstSet = idSetsToUpdate.shift() as unknown as Set<string>;
 				const allIds = fillAllDerivedBooIds(booMap, firstSet);
 				window.dispatchEvent(
 					new CustomEvent<UpdateDetail>(UPDATE_VALUE, {

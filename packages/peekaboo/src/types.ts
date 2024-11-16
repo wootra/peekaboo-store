@@ -28,10 +28,10 @@ type Setter<T> = (_value: T | PartialType<T>) => void;
 
 type BooType<T> = Readonly<{
 	__booType: BooNodeType;
-	__store: Store;
+	__store?: Store;
 	__booId: string;
 	__booUId: string;
-	init: () => T;
+	init: () => T | undefined;
 	__initialize: (_newVal?: T | PartialType<T>) => void;
 	__resetUsage: () => void;
 	reset: () => void;
