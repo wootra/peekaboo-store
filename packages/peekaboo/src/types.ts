@@ -4,7 +4,7 @@ type Store = {
 	snapshot: { data: Record<string, any> }; // data that will be used for the comparison
 	data: Record<string, any>; // data that will be used
 	booMap: Record<string, BooType<unknown>>;
-	triggerDispatch: (_idSet: Set<string>) => void;
+	triggerDispatch: (_idSet: Set<string>, _setOptions?: BooSetOptions) => void;
 };
 
 type PeekaType<K> = {
@@ -24,8 +24,12 @@ type PartialType<T> = T extends { [Key in keyof T]: T[Key] }
 	: T extends undefined | null
 		? unknown
 		: T;
-type Setter<T> = (_value: T | PartialType<T>) => void;
-
+type Setter<T> = (_value: T | PartialType<T>, _setOptions?: BooSetOptions) => void;
+type UsageInfo = {
+	isUsed: boolean;
+	isEverUsed: boolean;
+	isDirty: boolean;
+};
 type BooType<T> = Readonly<{
 	__booType: BooNodeType;
 	__store?: Store;
@@ -33,6 +37,7 @@ type BooType<T> = Readonly<{
 	__booUId: string;
 	init: () => T | undefined;
 	__initialize: (_newVal?: T | PartialType<T>) => void;
+	__usageInfo: (_info?: Partial<UsageInfo>) => UsageInfo;
 	__resetUsage: () => void;
 	reset: () => void;
 	isTransformed: () => boolean;
@@ -40,17 +45,13 @@ type BooType<T> = Readonly<{
 	get: () => T;
 	set: Setter<T>;
 	__layerKeys: string[];
-	__parentBoo: BooType<any> | null;
-	__used: () => boolean;
-	__everUsed: () => boolean;
-	__allUsed: () => boolean;
-	__allEverUsed: () => boolean;
-	__waterFallRefs: Set<BooType<any>>;
+	__parentBoo: BooType<unknown> | null;
+	__waterFallRefs: Set<BooType<unknown>>;
 }>;
 
 type UpdateDetail = Readonly<{
 	idSet?: Set<string>;
-	storeId: string;
+	// storeId: string;
 	forceRender?: boolean;
 }>;
 
@@ -103,11 +104,18 @@ type PeekabooOptions = {
 	 * for server side rendering, to prevent hydrate mismatch issue.
 	 */
 	staticId?: string;
+};
+
+type PeekabooUpdateOptions = {
 	/**
 	 * @default 100
 	 */
 	eventOptimizeInMs: number;
 };
+
+type BooSetOptions = Partial<{
+	instantDispatch: boolean;
+}>;
 
 export type {
 	Store,
@@ -123,8 +131,11 @@ export type {
 	PeekabooObjPartialSourceData,
 	UpdateDetail,
 	BooNodeType,
+	UsageInfo,
 	OrgTypes,
 	PartialOrgTypes,
+	BooSetOptions,
 	PartialType,
 	PeekabooOptions,
+	PeekabooUpdateOptions,
 };

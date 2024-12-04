@@ -8,11 +8,11 @@ function deriveBoo<NEW_RESULT>(deriveLogic: (_derive: <K>(_boo: BooType<K>) => K
 	const booCount = ++deriveBooIdBase;
 	const booId = `deriveBoo-${booCount}`;
 
-	const dependencies = new Set<BooType<any>>();
+	const dependencies = new Set<BooType<unknown>>();
 	const derivedBooRef: { curr: BooType<NEW_RESULT> | null } = { curr: null };
 	const unsub = () => {
 		for (const dep of dependencies) {
-			derivedBooRef.curr && dep.__waterFallRefs.delete(derivedBooRef.curr);
+			derivedBooRef.curr && dep.__waterFallRefs.delete(derivedBooRef.curr as BooType<unknown>);
 		}
 	};
 	derivedBooRef.curr = createBooObj(undefined, {
@@ -22,7 +22,7 @@ function deriveBoo<NEW_RESULT>(deriveLogic: (_derive: <K>(_boo: BooType<K>) => K
 	});
 
 	const deriveFunc: <K>(_boo: BooType<K>) => K = boo => {
-		derivedBooRef.curr && boo.__waterFallRefs.add(derivedBooRef.curr);
+		derivedBooRef.curr && boo.__waterFallRefs.add(derivedBooRef.curr as BooType<unknown>);
 		return boo.get();
 	};
 

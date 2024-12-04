@@ -1,12 +1,13 @@
 'use client';
 
-import { atom } from 'jotai';
+import { atom, createStore } from 'jotai';
 import { peeka, createPeekaboo } from 'peekaboo-store';
 
 function patom<T>(val: T) {
 	return peeka(atom(val));
 }
-
+const atomVal = atom('init');
+const atomVal2 = atom(1);
 const atoms = {
 	page1: {
 		dropDownIndex: patom(0),
@@ -31,7 +32,12 @@ const peeks = {
 				title: 'page2-header-title(init)',
 				subTitle: 'page2-header-subtitle(init)',
 			},
+			instantUpdate: {
+				count: 0,
+			},
 		},
 	},
 };
-export const peekaboo = createPeekaboo(peeks);
+const peekaboo = createPeekaboo(peeks);
+const atomStore = createStore();
+export { atomVal, atomVal2, peekaboo, atomStore };

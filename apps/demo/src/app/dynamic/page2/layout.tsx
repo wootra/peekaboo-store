@@ -2,10 +2,10 @@ import styles from 'app/layout.module.css';
 import LinkStyler from 'app/LinkStyler';
 import 'app/layout.css';
 import DataLoader from '../DataLoader';
-import { PeekabooObjSourceData } from 'peekaboo-store';
+import { PeekabooObjPartialSourceData } from 'peekaboo-store';
 import { peekaboo } from '../_data/const';
 import { Suspense } from 'react';
-const dataAfterTimeout: Partial<PeekabooObjSourceData<typeof peekaboo>> = {
+const dataAfterTimeout: Partial<PeekabooObjPartialSourceData<typeof peekaboo>> = {
 	routes: {
 		page1: {
 			header: {
@@ -24,7 +24,7 @@ const dataAfterTimeout: Partial<PeekabooObjSourceData<typeof peekaboo>> = {
 
 export default async function PageLayout({ children }: { children: React.ReactNode }) {
 	const mockDataDirect: object = await new Promise(res => {
-		const ret: Partial<PeekabooObjSourceData<typeof peekaboo>> = {
+		const ret: Partial<PeekabooObjPartialSourceData<typeof peekaboo>> = {
 			routes: {
 				page1: {
 					header: {

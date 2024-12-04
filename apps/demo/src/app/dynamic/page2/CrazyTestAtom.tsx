@@ -2,40 +2,33 @@
 
 import React, { useRef, useState } from 'react';
 
-import { peekaboo } from 'app/dynamic/_data/const';
-import { setUpdateOptions } from 'peekaboo-store';
+import { atomVal, atomStore, atomVal2 } from 'app/dynamic/_data/const';
+import { useSetAtom } from 'jotai';
 
-const page2HeaderSlice = peekaboo.data.routes.page2;
-const CrazyTest = () => {
+// const timeout = 10;
+const count = 100;
+const CrazyTestAtom = () => {
 	const [crazy, setCrazy] = useState<ReturnType<typeof setTimeout> | number>(-1);
 	const [crazy2, setCrazy2] = useState<ReturnType<typeof setTimeout> | number>(-1);
 	const [timeSpent, setTimeSpent] = useState(0);
 	const [timeout, setTimeoutValue] = useState(100);
-	const [performanceTimeout, setPerformanceTimeout] = useState(100);
-	const [count, setCount] = useState(1000000);
+	const [count, setCount] = useState(10);
+	const [performance, SetPerformance] = useState(0);
+	const numRef = useRef(0);
+	const numRef2 = useRef(0);
+	const startTime = useRef(0);
+	const [updated, setUpdated] = useState(0);
 	const onTimeoutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const valueToChange = Number(e.target.value);
-		if (valueToChange < 1) return 1;
-		if (valueToChange > 1000) return 1000;
+		if (valueToChange < 1 || valueToChange > 1000) return;
 		setTimeoutValue(valueToChange);
-	};
-	const onPerformanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const valueToChange = Number(e.target.value);
-		if (valueToChange < 1) return 1;
-		if (valueToChange > 1000) return 1000;
-		setUpdateOptions({ eventOptimizeInMs: valueToChange });
-		setPerformanceTimeout(valueToChange);
 	};
 	const onCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const valueToChange = Number(e.target.value);
 		if (valueToChange < 1) return 1;
 		setCount(valueToChange);
 	};
-	const [performance, SetPerformance] = useState(0);
-	const numRef = useRef(0);
-	const numRef2 = useRef(0);
-	const startTime = useRef(0);
-	const [updated, setUpdated] = useState(0);
+
 	const onCrazy = () => {
 		if (crazy !== -1) {
 			const timeSpent = (Date.now() - startTime.current) / 1000; // sec
@@ -57,13 +50,14 @@ const CrazyTest = () => {
 			const id = setInterval(() => {
 				// console.count('count');
 				for (let i = 0; i < count; i++) {
-					page2HeaderSlice.header.title._boo.set(`${numRef.current.toFixed(10)}`);
+					atomStore.set(atomVal, `${numRef.current.toFixed(10)}`);
 					numRef.current++;
 				}
 			}, timeout);
 
 			const id2 = setInterval(() => {
-				page2HeaderSlice.instantUpdate.count._boo.set(numRef2.current, { instantDispatch: true });
+				atomStore.set(atomVal2, numRef2.current);
+				// page2HeaderSlice.instantUpdate.count._boo.set(numRef2.current, { instantDispatch: true });
 				numRef2.current++;
 			}, timeout);
 			setCrazy(id);
@@ -72,9 +66,9 @@ const CrazyTest = () => {
 	};
 	return (
 		<div style={{ padding: '1rem', border: '1px solid gray', borderRadius: '1rem' }}>
-			<h3> peekaboo crazy test</h3>
+			<h3>Atom crazy test</h3>
 			<button onClick={onCrazy}>{(crazy as number) < 0 ? 'crazy!' : 'stop being crazy'}</button>
-			<p>this is testing 'set' function's performance. </p>
+			<p>this is testing 'set' function's performance.(atom) </p>
 			<p>when timeout time is smaller, it creates events more, so affecting the performance.</p>
 			<p>the purpose of this test is logical efficiency.</p>
 			<div>
@@ -87,12 +81,8 @@ const CrazyTest = () => {
 			<div>
 				update Timeout: <input type='number' onChange={onTimeoutChange} value={timeout} />
 			</div>
-			<div>
-				update Timeout(performance adjust):{' '}
-				<input type='number' onChange={onPerformanceChange} value={performanceTimeout} />
-			</div>
 		</div>
 	);
 };
 
-export default CrazyTest;
+export default CrazyTestAtom;

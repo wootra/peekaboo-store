@@ -22,7 +22,8 @@ const derived2 = deriveBoo(get => {
 
 const UpdatedDerived = () => {
 	return (
-		<div>
+		<div style={{ border: '1px solid gray', padding: '1rem' }}>
+			<h3>derived</h3>
 			<Updated boo={derived} />
 			<Updated boo={derived2} />
 		</div>

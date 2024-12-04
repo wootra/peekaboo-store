@@ -9,7 +9,7 @@
 	"files": [
 		"dist/**"
 	],
-	"exports2": {
+	"exports": {
 		".": "./src/index.ts",
 		"./react": "./src/react/index.ts",
 		"./vanilla": "./src/vanilla/index.ts",
@@ -19,7 +19,7 @@
 		"./utils/deriveBoo": "./src/utils/deriveBoo.ts",
 		"./utils/usage": "./src/utils/usage.ts"
 	},
-	"exports": {
+	"exports2": {
 		".": "./dist/index.mjs",
 		"./react": "./dist/react/index.mjs",
 		"./vanilla": "./dist/vanilla/index.mjs",

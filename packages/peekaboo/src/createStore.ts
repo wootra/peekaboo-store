@@ -1,6 +1,6 @@
 import { UPDATE_VALUE } from './consts';
 import { cloneInitData, sanitizeInitData } from './transformers';
-import type { BooType, PeekabooOptions, Store, UpdateDetail } from './types';
+import type { BooSetOptions, BooType, PeekabooOptions, PeekabooUpdateOptions, Store, UpdateDetail } from './types';
 
 let storeIdNumBase = Math.round(Math.random() * (1000 - 1)) + 1000;
 
@@ -24,56 +24,99 @@ const fillAllDerivedBooIds = (booMap: Store['booMap'], idSet: Set<string>) => {
 	return allIds;
 };
 
+const booMap: Record<string, BooType<unknown>> = {};
+
+type EventReceiver = {
+	eventOptimizeInMs: number;
+	timerId: number;
+};
+const eventReceiver: EventReceiver = {
+	eventOptimizeInMs: 100,
+	timerId: -1,
+};
+
+const setUpdateOptions = (eventOptions: PeekabooUpdateOptions) => {
+	const { eventOptimizeInMs = 100 } = eventOptions;
+	eventReceiver.eventOptimizeInMs = eventOptimizeInMs;
+};
+
+const triggerNow = (idSet: Set<string>) => {
+	window.dispatchEvent(
+		new CustomEvent<UpdateDetail>(UPDATE_VALUE, {
+			detail: {
+				idSet,
+				// storeId,
+				forceRender: true,
+			},
+		})
+	);
+};
+
+const idSetsToUpdate: Set<string> = new Set<string>();
+let reservedToUpdate = false;
+const updateNow = () => {
+	if (idSetsToUpdate.size > 0) {
+		if (typeof window !== 'undefined') {
+			triggerNow(idSetsToUpdate);
+			idSetsToUpdate.clear();
+		}
+		reservedToUpdate = false;
+	}
+};
+
+const triggerDispatch = (idSet: Set<string>, setOptions?: BooSetOptions) => {
+	let countToUpdate = 0;
+	const allIds = fillAllDerivedBooIds(booMap, idSet);
+	if (setOptions?.instantDispatch) {
+		triggerNow(allIds);
+		return;
+	}
+	for (const id of allIds) {
+		if (!idSetsToUpdate.has(id)) {
+			idSetsToUpdate.add(id);
+			countToUpdate++;
+		} else {
+			const boo = booMap[id];
+			if (boo?.__usageInfo().isDirty) {
+				// ignore redundant render
+				continue;
+			}
+			countToUpdate++;
+		}
+	}
+
+	if (countToUpdate > 0) {
+		if (!reservedToUpdate) {
+			reservedToUpdate = true;
+			// for the first request, update directly for the performance
+
+			if (typeof window !== 'undefined' && eventReceiver.timerId === -1) {
+				queueMicrotask(() => {
+					updateNow();
+				});
+				eventReceiver.timerId = setTimeout(() => {
+					updateNow();
+					eventReceiver.timerId = -1;
+				}, eventReceiver.eventOptimizeInMs);
+			}
+
+			// } else {
+		}
+	}
+};
+
 const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	initData: U,
 	options?: PeekabooOptions
 ): Store => {
-	const { staticId, eventOptimizeInMs = 100 } = options ?? {};
+	const { staticId } = options ?? {};
 	const storeIdBase = staticId ?? storeIdNumBase++;
 	const storeId = `peekabooStore-${storeIdBase}`;
-	const booMap = {} as unknown as Store['booMap'];
+
 	const cloned = cloneInitData(initData);
 	const snapshot = sanitizeInitData(initData);
 	const data = sanitizeInitData(initData);
-	let timerId = -1;
 
-	const idSetsToUpdate: Set<string>[] = [];
-	const updateNow = () => {
-		if (idSetsToUpdate.length > 0) {
-			if (typeof window !== 'undefined') {
-				const firstSet = idSetsToUpdate.shift() as unknown as Set<string>;
-				const allIds = fillAllDerivedBooIds(booMap, firstSet);
-				window.dispatchEvent(
-					new CustomEvent<UpdateDetail>(UPDATE_VALUE, {
-						detail: {
-							idSet: allIds,
-							storeId,
-							forceRender: true,
-						},
-					})
-				);
-			}
-		}
-	};
-
-	const triggerDispatch = (idSet: Set<string>) => {
-		if (idSetsToUpdate.length < 2) {
-			idSetsToUpdate.push(idSet);
-		} else {
-			// more than 2
-			const lastOne = idSetsToUpdate[idSetsToUpdate.length - 1];
-			[...idSet].forEach(id => {
-				lastOne.add(id);
-			});
-		}
-		if (timerId === -1) {
-			updateNow();
-			timerId = setTimeout(() => {
-				updateNow();
-				timerId = -1;
-			}, eventOptimizeInMs);
-		}
-	};
 	return {
 		storeId,
 		booMap,
@@ -86,4 +129,4 @@ const createStore = <U extends { [Key in keyof U & `_${string}`]: U[Key] }>(
 	};
 };
 
-export { createStore };
+export { createStore, setUpdateOptions };

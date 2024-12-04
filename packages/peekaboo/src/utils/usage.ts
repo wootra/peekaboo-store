@@ -19,21 +19,21 @@ function getUsageLog<U>(
 		const id = boo.__booId;
 		if (nodeType === 'all' || nodeType === boo.__booType) {
 			const toInclude = {
-				__used: boo.__used(),
-				__allUsed: boo.__allUsed(),
-				__everUsed: boo.__everUsed(),
-				__allEverUsed: boo.__allEverUsed(),
+				__used: boo.__usageInfo().isUsed,
+				__allUsed: boo.__usageInfo().isUsed,
+				__everUsed: boo.__usageInfo().isEverUsed,
+				__allEverUsed: boo.__usageInfo().isEverUsed,
 			};
 
 			if (includes === 'all') {
 				acc[id] = toInclude;
-			} else if (includes === 'used' && boo.__used()) {
+			} else if (includes === 'used' && boo.__usageInfo().isUsed) {
 				acc[id] = toInclude;
-			} else if (includes === 'everUsed' && boo.__everUsed()) {
+			} else if (includes === 'everUsed' && boo.__usageInfo().isEverUsed) {
 				acc[id] = toInclude;
-			} else if (includes === 'unused' && !boo.__used()) {
+			} else if (includes === 'unused' && !boo.__usageInfo().isUsed) {
 				acc[id] = toInclude;
-			} else if (includes === 'neverUsed' && !boo.__everUsed()) {
+			} else if (includes === 'neverUsed' && !boo.__usageInfo().isEverUsed) {
 				acc[id] = toInclude;
 			}
 		}

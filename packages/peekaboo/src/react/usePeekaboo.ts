@@ -13,9 +13,8 @@ export const usePeekaboo = <T>(boo: BooType<T>) => {
 			const ev = e as CustomEvent<UpdateDetail>;
 
 			// derived type does not need to match with storeId
-			const storeMatch = boo.__booType === 'derived' ? true : ev.detail.storeId === boo.__store?.storeId;
 
-			const shouldUpdate = ev.type === UPDATE_VALUE && ev.detail.idSet?.has(boo.__booUId) && storeMatch;
+			const shouldUpdate = ev.type === UPDATE_VALUE && ev.detail.idSet?.has(boo.__booUId);
 
 			if (shouldUpdate) {
 				queueMicrotask(() => {

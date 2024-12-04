@@ -6,7 +6,8 @@ import { peekaboo } from 'app/dynamic/_data/const';
 import Trigger from 'components/Trigger';
 import { BooDataType } from 'peekaboo-store';
 import { deriveBoo } from 'peekaboo-store/utils/deriveBoo';
-const page1HeaderSlice = peekaboo.data.routes.page1.header;
+import CrazyTest from './CrazyTest';
+const page1HeaderSlice = peekaboo.data.routes.page2.header;
 const titles: BooDataType<typeof page1HeaderSlice._boo>[] = [
 	{
 		subTitle: 'subTitle1',
@@ -41,6 +42,8 @@ export default function Page() {
 
 			{/* <div>{dropDownIndex}</div> */}
 			<h1>Web</h1>
+			<CrazyTest />
+			<Updated boo={peekaboo.data.routes.page2.instantUpdate.count._boo} />
 			<Updated boo={page1HeaderSlice.title._boo} />
 			<Updated boo={page1HeaderSlice.subTitle._boo} />
 			<Updated boo={derived} />

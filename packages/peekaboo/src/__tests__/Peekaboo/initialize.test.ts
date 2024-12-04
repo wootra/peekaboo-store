@@ -45,18 +45,18 @@ describe('Peekaboo', () => {
 				});
 
 				// check used status
-				expect(store.data.threeLayer.twoLayer.key1._boo.__used()).toEqual(true);
-				expect(store.data.threeLayer.twoLayer._boo.__everUsed()).toEqual(true);
+				expect(store.data.threeLayer.twoLayer.key1._boo.__usageInfo().isUsed).toEqual(true);
+				expect(store.data.threeLayer.twoLayer._boo.__usageInfo().isEverUsed).toEqual(true);
 
 				store.data.threeLayer._boo.__initialize({
 					twoLayer: { key1: 'value2', key2: 123, key3: true },
 				});
 
 				// check used status unset
-				expect(store.data.threeLayer.twoLayer.key1._boo.__used()).toEqual(false);
-				expect(store.data.threeLayer.twoLayer.key1._boo.__everUsed()).toEqual(true);
-				expect(store.data.threeLayer.twoLayer._boo.__used()).toEqual(false);
-				expect(store.data.threeLayer.twoLayer._boo.__everUsed()).toEqual(true);
+				expect(store.data.threeLayer.twoLayer.key1._boo.__usageInfo().isUsed).toEqual(false);
+				expect(store.data.threeLayer.twoLayer.key1._boo.__usageInfo().isEverUsed).toEqual(true);
+				expect(store.data.threeLayer.twoLayer._boo.__usageInfo().isUsed).toEqual(false);
+				expect(store.data.threeLayer.twoLayer._boo.__usageInfo().isEverUsed).toEqual(true);
 
 				// check if value is set
 				expect(store.data.threeLayer.twoLayer.key1._boo.get()).toEqual('value2');

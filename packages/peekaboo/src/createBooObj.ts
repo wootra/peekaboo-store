@@ -1,7 +1,7 @@
 import { createBooUid, createBooUidFromLayer } from './createBooUid';
 import { reinitialize } from './reinitialize';
 import { _getObjByKey, stripPeeka, syncAndCollectChanged, updateValuesInObjByKey } from './transformers';
-import type { BooNodeType, BooType, PartialType, Store } from './types';
+import type { BooNodeType, BooSetOptions, BooType, PartialType, Store, UsageInfo } from './types';
 
 type BooInfo =
 	| {
@@ -24,11 +24,17 @@ const createBooObj = <T>(__store: Store | undefined, booInfo: BooInfo) => {
 	const __parentBoo = parentBoo; // only for valid branch. should not
 	const __booId = __parentBoo?.__booId ? `${__parentBoo.__booId}.${booKey}` : booKey;
 	const __booUId = createBooUid(__store, __booId);
-	const usageInfo = {
+	const usageInfo: UsageInfo = {
 		isUsed: false,
 		isEverUsed: false,
+		isDirty: false, // when set is called, should be true, when get is called, should be false.
 	};
-
+	const __usageInfo = (info?: Partial<typeof usageInfo>) => {
+		if (info) {
+			Object.assign(usageInfo, info);
+		}
+		return usageInfo;
+	};
 	const __waterFallRefs = new Set<BooType<any>>();
 
 	const __transformer: { func: ((_val: T) => T) | null } = { func: null };
@@ -55,7 +61,7 @@ const createBooObj = <T>(__store: Store | undefined, booInfo: BooInfo) => {
 	// - if the hook is registered(store.hookRegisteredCount[booUid] > 0), should create update event. if not, don't create event.
 	// - clear tempIdSet
 	// - update snapshot to match with value
-	const set = (newValue: T | PartialType<T>) => {
+	const set = (newValue: T | PartialType<T>, setOptions?: BooSetOptions) => {
 		const idSet = new Set<string>();
 		// const initDataObj = _getObjByKey(__store.initData, __layerKeys);
 		// const dataObj = _getObjByKey(__store, __layerKeys);
@@ -91,7 +97,8 @@ const createBooObj = <T>(__store: Store | undefined, booInfo: BooInfo) => {
 				currParent = currParent.__parentBoo;
 			}
 			idSet.add(__booUId);
-			__store.triggerDispatch(idSet);
+			__store.triggerDispatch(idSet, setOptions);
+			usageInfo.isDirty = true;
 		}
 	};
 
@@ -119,26 +126,10 @@ const createBooObj = <T>(__store: Store | undefined, booInfo: BooInfo) => {
 		__initialize();
 	};
 
-	const __used = () => {
-		return usageInfo.isUsed;
-	};
-
-	const __allUsed = () => {
-		return usageInfo.isUsed;
-	};
-
-	const __everUsed = () => {
-		return usageInfo.isEverUsed;
-	};
-
-	const __allEverUsed = () => {
-		return usageInfo.isEverUsed;
-	};
-
 	const get = () => {
 		usageInfo.isUsed = true;
 		usageInfo.isEverUsed = true;
-
+		usageInfo.isDirty = false;
 		if (__transformer.func) {
 			return __transformer.func((dataObj as any)?.[booKey] as T);
 		}
@@ -159,11 +150,8 @@ const createBooObj = <T>(__store: Store | undefined, booInfo: BooInfo) => {
 		__parentBoo,
 		init,
 		reset,
+		__usageInfo,
 		__resetUsage,
-		__used,
-		__allUsed,
-		__everUsed,
-		__allEverUsed,
 		__initialize,
 		__waterFallRefs,
 		transform,
