@@ -18,7 +18,7 @@ const subTitles = ['subTitle1', 'subTitle2'];
 
 export default function Page() {
 	const arrays = useMemo(() => {
-		return new Array(1000).fill(null).map((_, idx) => {
+		return new Array(2000).fill(null).map((_, idx) => {
 			return (
 				<div key={`id_${idx}`}>
 					<UpdatedAtom store={atomStore} atomVal={atomVal} />

@@ -1,5 +1,9 @@
 # Change Logs
 
+## 1.9.0
+performance adjustment
+change performance adjustment API
+
 ## 1.8.0
 add derivedBoo
 add transformer

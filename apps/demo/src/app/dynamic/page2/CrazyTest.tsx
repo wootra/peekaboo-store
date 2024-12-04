@@ -12,7 +12,7 @@ const CrazyTest = () => {
 	const [timeSpent, setTimeSpent] = useState(1);
 	const [timeout, setTimeoutValue] = useState(100);
 	const [performanceTimeout, setPerformanceTimeout] = useState(100);
-	const [count, setCount] = useState(1000000);
+	const [count, setCount] = useState(10000);
 	const numRef = useRef(0);
 	const numRef2 = useRef(0);
 	const startTime = useRef(0);
@@ -26,7 +26,7 @@ const CrazyTest = () => {
 	const onPerformanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const valueToChange = Number(e.target.value);
 		if (valueToChange < 1) return 1;
-		if (valueToChange > 1000) return 1000;
+		// if (valueToChange > 1000) return 1000;
 		setUpdateOptions({ eventOptimizeInMs: valueToChange });
 		setPerformanceTimeout(valueToChange);
 	};
@@ -61,7 +61,8 @@ const CrazyTest = () => {
 			}, timeout);
 
 			const id2 = setInterval(() => {
-				page2HeaderSlice.instantUpdate.count._boo.set(numRef2.current, { instantDispatch: true });
+				// page2HeaderSlice.instantUpdate.count._boo.set(numRef2.current, { instantDispatch: true });
+				page2HeaderSlice.instantUpdate.count._boo.set(numRef2.current);
 				numRef2.current++;
 			}, timeout);
 			setCrazy(id);

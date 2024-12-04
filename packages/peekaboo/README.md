@@ -421,7 +421,7 @@ But I don't want to create a new instance, and want transform only for the speci
 We can call `transform` function to manage its return value easily.
 
 ```typescript
-const peekaboo = createPeekaboo({key1: {key2: 'value', key3: }});
+const peekaboo = createPeekaboo({key1: {key2: 'value', key3: 2 }});
 const valueBooKey2 = peekaboo.data.key1.key2._boo;
 console.log(valueBooKey2.get()); // ===> will print `value`
 valueBooKey1.transform(val=>val.toUpperCase());
@@ -435,8 +435,43 @@ But, the benefit of this is, this transform restrict the same type of the origin
 Which means, it will make your application safer.
 
 ```typescript
-const peekaboo = createPeekaboo({key1: {key2: 'value', key3: }});
+const peekaboo = createPeekaboo({key1: {key2: 'value', key3: 2}});
 const valueBooKey2 = peekaboo.data.key1.key2._boo;
 valueBooKey1.transform(val=>val.length()); // ==> will create a type error! (trying to convert string => number)
 ```
 ![type mismatch on transform](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/type-mismatch-on-transform.png?raw=true)
+
+
+## Performance adjustment option
+
+Peekaboo store is designed to be fast-update with no freeze on rendering.
+When input data is changed too fast, the rendering attached to the data source can cause UI freeze.
+Peekaboo store tested with 1000 elements updating the data 1000 times/sec causing no freeze. 
+That's not it! Peekaboo store can control the speed of update event. 
+For example, even though your asynchronous logic update the graph data 1000 times per sec, you can choose just 1 time update or 100 times update maximum based on the design you're considering for your app.
+Your data is saved first, but the rendering will follow based on the speed you set without losing data!
+Also, you can access to the current data with Boo.get() even before rendering! 
+
+### Set default debouncing time
+
+```typescript
+import {setUpdateOptions} from 'peekaboo-store';
+
+setUpdateOptions({eventOptimizeInMs: 100}); // use 100ms for default debouncing in render
+```
+
+### Bypass debouncing rate
+If you want to trigger rendering without debouncing, you can simply add {instantDispatch: true} option when you set a Boo.
+
+```typescript
+const peekaboo = createPeekaboo({key1: {key2: 'value', key3: 2 }});
+const valueBooKey2 = peekaboo.data.key1.key2._boo;
+valueBooKey2.set('val2', {instantDispatch: true});
+```
+
+### Steady performance
+
+Even though the number of update for the data is increased, the rendering performance is hardly affected.
+See this benchmark result comparing to jotai.
+
+![performance comparison](https://github.com/wootra/peekaboo-store/blob/main/packages/peekaboo/performance.png?raw=true)
