@@ -9,10 +9,14 @@ const page2HeaderSlice = peekaboo.data.routes.page2;
 const CrazyTest = () => {
 	const [crazy, setCrazy] = useState<ReturnType<typeof setTimeout> | number>(-1);
 	const [crazy2, setCrazy2] = useState<ReturnType<typeof setTimeout> | number>(-1);
-	const [timeSpent, setTimeSpent] = useState(0);
+	const [timeSpent, setTimeSpent] = useState(1);
 	const [timeout, setTimeoutValue] = useState(100);
 	const [performanceTimeout, setPerformanceTimeout] = useState(100);
 	const [count, setCount] = useState(1000000);
+	const numRef = useRef(0);
+	const numRef2 = useRef(0);
+	const startTime = useRef(0);
+	const [updated, setUpdated] = useState(0);
 	const onTimeoutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const valueToChange = Number(e.target.value);
 		if (valueToChange < 1) return 1;
@@ -31,20 +35,14 @@ const CrazyTest = () => {
 		if (valueToChange < 1) return 1;
 		setCount(valueToChange);
 	};
-	const [performance, SetPerformance] = useState(0);
-	const numRef = useRef(0);
-	const numRef2 = useRef(0);
-	const startTime = useRef(0);
-	const [updated, setUpdated] = useState(0);
+
 	const onCrazy = () => {
 		if (crazy !== -1) {
 			const timeSpent = (Date.now() - startTime.current) / 1000; // sec
 			// setUpdated(timeSpent);
 			setTimeSpent(timeSpent);
-			setUpdated(Math.round(numRef.current));
-			const fullPerformance = count * (1000 / timeout);
-			SetPerformance(Math.round((numRef.current / timeSpent / fullPerformance) * 10000) / 100);
-			startTime.current = Date.now();
+			setUpdated(numRef.current);
+
 			clearInterval(crazy as number);
 			clearInterval(crazy2 as number);
 			numRef.current = 0;
@@ -70,6 +68,9 @@ const CrazyTest = () => {
 			setCrazy2(id2);
 		}
 	};
+	const fullPerformance = count * (1000 / timeout);
+	const performance = Math.round((updated / timeSpent / fullPerformance) * 10000) / 100;
+
 	return (
 		<div style={{ padding: '1rem', border: '1px solid gray', borderRadius: '1rem' }}>
 			<h3> peekaboo crazy test</h3>
@@ -82,7 +83,9 @@ const CrazyTest = () => {
 			</div>
 			<div>time spent: {timeSpent} sec</div>
 			<div>interval count: {1000 / timeout}/s</div>
-			<div>updated: {updated} times</div>
+			<div>
+				updated: {updated} times / {fullPerformance * timeSpent}
+			</div>
 			<div>performance: {performance}%</div>
 			<div>
 				update Timeout: <input type='number' onChange={onTimeoutChange} value={timeout} />
