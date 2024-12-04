@@ -26,34 +26,34 @@ describe('reinitialize', () => {
 	});
 	it('should re-initializ when new value is given', () => {
 		const boo = peekaboo.data.route1.sub.key1._boo;
-		expect(boo.__used()).toBe(false);
+		expect(boo.__usageInfo().isUsed).toBe(false);
 		expect(boo.get()).toBe('value'); // when reading, __used() is set to true
 		expect(boo.init()).toBe('value'); // when reading, __used() is set to true
-		expect(boo.__used()).toBe(true);
+		expect(boo.__usageInfo().isUsed).toBe(true);
 
 		reinitializeWrapper(peekaboo.store, peekaboo.store.initData.data.route1, { key1: 'value2' }, 'sub', [
 			'data',
 			'route1',
 		]);
-		expect(boo.__used()).toBe(false);
+		expect(boo.__usageInfo().isUsed).toBe(false);
 		expect(boo.get()).toBe('value'); // value stays as it is. should use set to update value.
 		expect(boo.init()).toBe('value2'); // only init is updated
-		expect(boo.__used()).toBe(true);
+		expect(boo.__usageInfo().isUsed).toBe(true);
 	});
 
 	it('should re-initializ with full structure', () => {
 		const boo = peekaboo.data._boo;
 
-		expect(boo.__used()).toBe(false);
+		expect(boo.__usageInfo().isUsed).toBe(false);
 		expect(boo.get()).toStrictEqual(defaultPureVal); // when reading, __used() is set to true
 		expect(boo.init()).toStrictEqual(defaultPureVal); // when reading, __used() is set to true
-		expect(boo.__used()).toBe(true);
+		expect(boo.__usageInfo().isUsed).toBe(true);
 		const changed = { route1: { sub: { key1: 'value1', key2: 999, peeka: peekaObj, arr } } };
 		reinitializeWrapper(peekaboo.store, peekaboo.store.initData, changed, 'data', []);
-		expect(boo.__used()).toBe(false);
+		expect(boo.__usageInfo().isUsed).toBe(false);
 		expect(boo.get()).toStrictEqual(defaultPureVal); // value stays as it is. should use set to update value.
 		expect(boo.init()).toStrictEqual(changed); // only init is updated
-		expect(boo.__used()).toBe(true);
+		expect(boo.__usageInfo().isUsed).toBe(true);
 	});
 	it('should throw Error when object is not given', () => {
 		expect(() => {
